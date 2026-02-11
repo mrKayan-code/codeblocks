@@ -11,14 +11,14 @@ body {
 }
 
 #palette {
-    width: 200px;
+    width: 250px;
     float: left;
     border: 1px solid #ccc;
     padding: 8px;
 }
 
 #canvas {
-    margin-left: 220px;
+    margin-left: 270px;
     min-height: 400px;
     border: 2px dashed #999;
     padding: 8px;
@@ -27,6 +27,7 @@ body {
 .block {
     background-color: #4AAE9B;
     color: #fff;
+    width: 200px;
     padding: 6px 8px;
     margin-bottom: 6px;
 }
