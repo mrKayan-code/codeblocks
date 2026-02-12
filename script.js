@@ -1,31 +1,94 @@
+// const canvas = document.getElementById('canvas');
+// const blocks = document.querySelectorAll('#palette .block');
+
+
+// blocks.forEach(block => {
+//     block.addEventListener('dragstart', dragStart);
+// });
+
+// canvas.addEventListener('dragover', function(event) {
+//     event.preventDefault();
+// });
+
+// canvas.addEventListener('drop', function(event) {
+//     // event.preventDefault();
+
+//     const text = event.dataTransfer.getData('text/plain');
+
+//     const dropped = document.createElement('div');
+//     dropped.className = 'block';
+//     dropped.textContent = text;
+
+//     canvas.appendChild(dropped);
+// });
+
+// function dragStart(event) {
+//     event.dataTransfer.setData('text/plain', event.target.textContent);
+//     console.log(event.target.textContent)
+// }
+
+
+
 const canvas = document.getElementById('canvas');
-const blocks = document.querySelectorAll('#palette .block');
+const palette = document.getElementById('palette');
+
+let draggedItem = null;
+let sourceZone = null;  //фигни чтобы помнить что и откуда перетаскичаю
+
+const originalBlocks = document.querySelectorAll('#palette .block');
+originalBlocks.forEach(block => {
+    makeDraggable(block);
+})
 
 
-blocks.forEach(block => {
-    block.addEventListener('dragstart', dragStart);
-});
+function makeDraggable(element) {
+    element.setAttribute('draggable', 'true');
+
+    element.addEventListener ('dragstart', function(event) {
+        draggedItem = element;
+        sourceZone = element.parentElement.id === 'palette' ? 'palette' : 'canvas';
+        
+        event.dataTransfer.effectAllowed = sourceZone === 'palette' ? 'copy' : 'move';
+    });
+}
+
+//тут логика для раб обл
 
 canvas.addEventListener('dragover', function(event) {
-    event.preventDefault();
+    event.preventDefault(); 
 });
 
 canvas.addEventListener('drop', function(event) {
-    // event.preventDefault();
+    event.preventDefault();
 
-    const text = event.dataTransfer.getData('text/plain');
+    if (sourceZone === 'palette') {
+        const clone = draggedItem.cloneNode(true);
+        makeDraggable(clone);
+        canvas.appendChild(clone);
+    }
 
-    const dropped = document.createElement('div');
-    dropped.className = 'block';
-    dropped.textContent = text;
+    else if (sourceZone === 'canvas') {
+        canvas.appendChild(draggedItem);
+    }
 
-    canvas.appendChild(dropped);
+    draggedItem = null;
+    sourceZone = null;
+
 });
 
-function dragStart(event) {
-    event.dataTransfer.setData('text/plain', event.target.textContent);
-    console.log(event.target.textContent)
-}
+// щас бахнем логику для палитры 
 
+palette.addEventListener('dragover', function(event) {
+    event.preventDefault();
+});
 
+palette.addEventListener('drop', function(event){
+    event.preventDefault();
 
+    if (sourceZone === 'canvas') {
+        draggedItem.remove();
+    }
+
+    draggedItem = null;
+    sourceZone = null;
+});

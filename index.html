@@ -2,23 +2,28 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Codeblock</title>
+    <title>67-Blocks</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Codeblock</h1>
+    <h1>67-Blocks</h1>
 
     <div id="palette">
-        <h2>палитра</h2>
+        <h2>Палитра</h2>
 
-        <div class="block" draggable="true">lit</div>
-        <div class="block" draggable="true">set</div>
+        <div class="block" draggable="true">6</div>
+        <div class="block" draggable="true">7</div>
     </div>
 
     <div id="canvas">
-        <h2>раб область</h2>
-    </div>s
-
+        <h2>Рабочее пространство</h2>
+        <div id="startblock">Start</div>
+    </div>
+<script>
+    document.getElementById('startblock').onclick = function() {
+        alert('Пока нету блоков команд');
+    };
+</script>
     <script src="script.js"></script>
 </body>
 </html>
