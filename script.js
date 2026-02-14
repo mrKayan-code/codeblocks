@@ -73,6 +73,8 @@ function makeDroppable(element) {
         draggedItem = null;
         sourceZone = null;
 
+
+
         // event.stopPropagation();
     });
 }
@@ -119,3 +121,7 @@ palette.addEventListener('drop', function(event){
     draggedItem = null;
     sourceZone = null;
 });
+
+
+
+
