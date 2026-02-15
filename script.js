@@ -92,7 +92,7 @@ palette.addEventListener('drop', function(event){
 });   
 
  
-
+// коммент миши
 
 
 
