@@ -35,7 +35,7 @@ const palette = document.getElementById('palette');
 let draggedItem = null;
 let sourceZone = null;  //фигни чтобы помнить что и откуда перетаскичаю
 
-const originalBlocks = document.querySelectorAll('#palette .block');
+const originalBlocks = document.querySelectorAll('#palette [class^="block"]');
 originalBlocks.forEach(block => {
     makeDraggable(block);
 })

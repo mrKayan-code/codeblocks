@@ -11,28 +11,37 @@
     <div id="palette">
         <h2>Палитра</h2>
 
-        <div class="block" draggable="true"> var
-            <label>имя</label><input type="text">
+        <div class="block-var" draggable="true"> var
+            <br>
+            <label for="type-input">type</label><select class="type-input" name = "type">
+                <option value="int">int</option>
+                <option value="string">string</option>
+                <option value="bool">bool</option>
+            </select>
+
+            <label for="name-input">name </label><input class="name-input" type="text">
         </div>
-        <div class="block" draggable="true">var set
-            <div class="inp-block"></div>
+        <div class="block-assign" draggable="true">var set
+            <div class="inp-block-left"></div>
             <label> = </label>
-            <div class="inp-block"></div>
+            <div class="inp-block-right"></div>
         </div>
 
         <div class="block" draggable="true">var</div>
         <div class="block" draggable="true">test block</div>
     </div>
 
+    <div id="startblock">Start</div>
+
     <div id="canvas">
-        <h2>Рабочее пространство</h2>
-        <div id="startblock">Start</div>
+        
     </div>
-<script>
+<!-- <script>
     document.getElementById('startblock').onclick = function() {
         alert('Пока нету блоков команд');
     };
-</script>
+</script> -->
     <script src="script.js"></script>
+    <script src="interpretator.js"></script>
 </body>
 </html>
