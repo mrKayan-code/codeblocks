@@ -120,7 +120,9 @@ palette.addEventListener('drop', function(event){
 
     draggedItem = null;
     sourceZone = null;
-});
+});   
+
+ 
 
 
 
