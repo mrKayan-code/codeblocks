@@ -25,7 +25,7 @@ function reset() {
 function convertBlockToNode(className, block) {
     switch (className) {
         case 'block-var':
-            return {type: block.querySelector('.type-input'), name: block.querySelector('.name-input')};
+            return {type: block.querySelector('.type-input').value, name: block.querySelector('.name-input').value};
             break;
         case 'block-assign':
             return
@@ -46,7 +46,7 @@ function buildAST(canvas) {
     for (const child of children) {
         ast.push({
             block_type: child.className,
-            node: convertBlockToNode(className, child)
+            node: convertBlockToNode(child.className, child)
         })
     }
 }
