@@ -22,16 +22,29 @@ function reset() {
     ast.length = 0;
 }
 
-function convertBlockToNode(className, block) {
-    switch (className) {
+function parseExpression(expr) { //пока только математика
+
+}
+
+function convertBlockToNode(block) {
+    switch (block.className) {
         case 'block-var':
-            return {type: block.querySelector('.type-input').value, name: block.querySelector('.name-input').value};
-            break;
+            return (function() {
+                return {type: block.querySelector('.type-input').value, name: block.querySelector('.name-input').value};
+            })();
         case 'block-assign':
-            return
-            break;
+            return (function() {
+                const vari = block.querySelector('.var-input').value;
+                const expr = block.querySelector('.expr-input').value;
+                return {var: vari, expr: expr};
+            })();            
+        case 'block-print-var':
+            return (function() {
+                const vari = block.querySelector('.var-input').value;
+                return {var: vari};
+            })(); 
         default:
-            return {type};
+            return {type: undefined};
             break;
     }
 
@@ -46,9 +59,7 @@ function buildAST(canvas) {
     for (const child of children) {
         ast.push({
             block_type: child.className,
-            node: convertBlockToNode(child.className, child)
+            node: convertBlockToNode(child)
         })
     }
 }
-
-// тут только мой коммент
