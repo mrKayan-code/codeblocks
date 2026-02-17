@@ -51,4 +51,3 @@ function buildAST(canvas) {
     }
 }
 
-// тут только мой коммент
