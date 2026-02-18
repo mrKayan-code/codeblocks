@@ -62,6 +62,7 @@ canvas.addEventListener('drop', function(event) {
 if (event.target === canvas) {
         if (sourceZone === 'palette') {
             const clone = draggedItem.cloneNode(true);
+        clone.classList.remove('palette-block')
             makeDraggable(clone);
             makeDroppable(clone);
             clone.querySelectorAll('.inner-slot').forEach(slot => setupSlot(slot));

@@ -55,20 +55,20 @@ body {
 [class^="block"] {
     background-color: #000000;
     color: #ffffff;
-    width: 250px;
+    width: 90%;
     padding: 6px 8px;
     margin-bottom: 2px; 
     border-radius: 8px;
 }
 
-.block {
+/* .block {
     background-color: #000000;
     color: #ffffff;
-    width: 250px;
+    width: 400px;
     padding: 6px 8px;
     margin-bottom: 2px; 
     border-radius: 8px;
-}
+} */
 
 .dropped { 
     position: absolute; 
@@ -96,6 +96,10 @@ body {
 #startblock:hover {
     box-shadow: 0 0 15px rgba(252, 239, 60, 0.8);
     transform: scale(1.1);
+}
+ 
+.palette-block {
+    width: 90%;
 }
 
 .block.block-container {
