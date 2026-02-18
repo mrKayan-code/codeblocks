@@ -5,6 +5,7 @@ const ast = [];
 
 
 start_button.addEventListener('click', () => {
+    reset();
     const canvas = document.getElementById('canvas');
 
     buildAST(canvas);
@@ -51,7 +52,7 @@ function convertBlockToNode(block) {
 
 
 function buildAST(canvas) {
-    reset();
+    
 
     const children = Array.from(canvas.children);
 

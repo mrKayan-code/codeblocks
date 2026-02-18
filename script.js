@@ -1,3 +1,6 @@
+// TODO(баг можно перетаскивать блоки в while на палитре)
+
+
 const canvas = document.getElementById('canvas');
 const palette = document.getElementById('palette');
 
@@ -62,7 +65,7 @@ canvas.addEventListener('drop', function(event) {
 if (event.target === canvas) {
         if (sourceZone === 'palette') {
             const clone = draggedItem.cloneNode(true);
-        clone.classList.remove('palette-block')
+            clone.classList.remove('palette-block')
             makeDraggable(clone);
             makeDroppable(clone);
             clone.querySelectorAll('.inner-slot').forEach(slot => setupSlot(slot));
@@ -89,8 +92,6 @@ palette.addEventListener('drop', function(event) {
     draggedItem = null;
     sourceZone = null;
 }); 
-
-
 
 
 function setupSlot(slot) {
@@ -127,4 +128,3 @@ function setupSlot(slot) {
         sourceZone = null;
     });
 }
-
