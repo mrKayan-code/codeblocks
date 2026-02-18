@@ -1,6 +1,61 @@
+class Scope {
+    parent
+    var_table
+
+    constructor(parent = null) {
+        this.parent = parent;
+        this.var_table = {};
+    }
+
+    hasLocal(name) {
+        return name in this.var_table;
+    }
+
+    getVar(name) {
+        if (name in this.var_table){
+            return this.var_table[name];
+        }
+        
+        if (this.parent !== null) {
+            return this.parent.getVar(name);
+        }
+        
+        return null;
+
+    }
+
+    addVar(name, type) {
+        if (this.hasLocal(name)) {
+            return null;
+        }
+
+        this.var_table[name] = {
+            type: type,
+            value: initialValue
+        };
+        
+        return this.var_table[name];
+    }
+
+    setVar(name, value) {
+        if (name in this.var_table) {
+            this.var_table[name].value = value;
+            return var_table[name];
+        }
+        //TODO(добавить проверку на типы но пока так сойдет)
+
+        if (this.parent !== null) {
+            this.parent.setVar(name, value);
+            return var_table[name];
+        }
+
+        return null;
+    }
+
+}
+
 const start_button = document.getElementById('startblock');
 
-const global_vars = {};
 const ast = [];
 
 
@@ -8,11 +63,11 @@ start_button.addEventListener('click', () => {
     reset();
     const canvas = document.getElementById('canvas');
 
-    buildAST(canvas);
+    buildAST(canvas, null);
 
     console.log(ast);
 
-    // console.log(global_vars);
+    
 });
 
 function reset() {
@@ -23,8 +78,8 @@ function reset() {
     ast.length = 0;
 }
 
-function parseExpression(expr) { //пока только математика
-    
+function parseExpression(expr) { //TODO(парсер выражений потом разберемся и с лог через опз)
+
 }
 
 function convertBlockToNode(block) {
@@ -43,7 +98,7 @@ function convertBlockToNode(block) {
             return (function() {
                 const vari = block.querySelector('.var-input').value;
                 return {var: vari};
-            })(); // нужно добавить 
+            })();
         default:
             return {type: undefined};
     }
@@ -51,7 +106,7 @@ function convertBlockToNode(block) {
 }
 
 
-function buildAST(canvas) {
+function buildAST(canvas, parentScope) {
     
 
     const children = Array.from(canvas.children);
