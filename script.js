@@ -10,7 +10,7 @@ let sourceZone = null;  //фигни чтобы помнить что и отк�
 const originalBlocks = document.querySelectorAll('#palette [class^="block"]');
 originalBlocks.forEach(block => {
     makeDraggable(block);
-    block.querySelectorAll('.inner-slot').forEach(slot => setupSlot(slot));
+    // block.querySelectorAll('.inner-slot').forEach(slot => setupSlot(slot));
 });
 
 
