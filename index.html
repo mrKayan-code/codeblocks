@@ -11,7 +11,7 @@
     <div id="palette">
         <h2>Палитра</h2>
 
-        <div class="block-var" draggable="true"> var
+        <div class="block-var palette-block" draggable="true"> var
             <br>
             <label for="type-input">type</label><select class="type-input" name = "type">
                 <option value="int">int</option>
@@ -22,7 +22,7 @@
             <label for="name-input">name </label><input class="name-input" type="text">
         </div>
 
-        <div class="block-assign" draggable="true">assign
+        <div class="block-assign palette-block" draggable="true">assign
             <label for="var-input">var</label><select class="var-input" name = "var-input">
                 <option value="test1">test1</option>
                 <option value="test2">test2</option>
@@ -30,11 +30,11 @@
             </select>
             <!-- <div class="inp-block-left"></div> -->
             <label> = </label>
-            <label for="expr-input">var</label><input class="expr-input" type="text">
+            <input class="expr-input" type="text">
             <!-- <div class="inp-block-right"></div> -->
         </div>
 
-        <div class="block-print-var" draggable="true">print
+        <div class="block-print-var palette-block" draggable="true">print
             <label for="var-input">var</label><select class="var-input" name = "var-input">
                 <option value="test1">test1</option>
                 <option value="test2">test2</option>

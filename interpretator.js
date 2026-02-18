@@ -42,10 +42,9 @@ function convertBlockToNode(block) {
             return (function() {
                 const vari = block.querySelector('.var-input').value;
                 return {var: vari};
-            })(); 
+            })(); // нужно добавить 
         default:
             return {type: undefined};
-            break;
     }
 
 }
@@ -63,3 +62,4 @@ function buildAST(canvas) {
         })
     }
 }
+
