@@ -21,6 +21,7 @@
 
             <label for="name-input">name </label><input class="name-input" type="text">
         </div>
+
         <div class="block-assign" draggable="true">var set
             <div class="inp-block-left"></div>
             <label> = </label>
@@ -29,13 +30,24 @@
 
         <div class="block" draggable="true">var</div>
         <div class="block" draggable="true">test block</div>
+
+        <div class="block block-container" draggable="true">
+            <div class="block-header">While:</div>
+            <div class="inner-slot"></div>
+        </div>
+
     </div>
 
     <div id="startblock">Start</div>
 
-    <div id="canvas">
-        
-    </div>
+    <div id="canvas"></div>
+
+<!-- <script>
+    document.getElementById('startblock').onclick = function() {
+        alert('Пока нету блоков команд');
+    };
+</script> -->
+
     <script src="script.js"></script>
     <script src="interpretator.js"></script>
 </body>
