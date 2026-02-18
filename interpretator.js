@@ -56,33 +56,33 @@ class Scope {
 
 const start_button = document.getElementById('startblock');
 
-const ast = [];
+
 
 
 start_button.addEventListener('click', () => {
-    reset();
+    // reset();
     const canvas = document.getElementById('canvas');
 
-    buildAST(canvas, null);
+    const ast = buildAST(canvas, null);
 
     console.log(ast);
 
-    
+
 });
 
-function reset() {
-    for (const key in global_vars) {
-        delete global_vars[key];
-    }
+// function reset() {
+//     // for (const key in global_vars) {
+//     //     delete global_vars[key];
+//     // }
 
-    ast.length = 0;
-}
+//     ast.length = 0;
+// }
 
 function parseExpression(expr) { //TODO(парсер выражений потом разберемся и с лог через опз)
 
 }
 
-function convertBlockToNode(block) {
+function convertBlockToNode(block, scope) {
     switch (block.className) {
         case 'block-var':
             return (function() {
@@ -93,11 +93,16 @@ function convertBlockToNode(block) {
                 const vari = block.querySelector('.var-input').value;
                 const expr = block.querySelector('.expr-input').value;
                 return {var: vari, expr: expr};
-            })();            
+            })();
         case 'block-print-var':
             return (function() {
                 const vari = block.querySelector('.var-input').value;
                 return {var: vari};
+            })();
+        case 'block-container':
+            return (function() {
+                const inner_canvas = block.querySelector('.inner-slot');
+                return buildAST(inner_canvas, scope)
             })();
         default:
             return {type: undefined};
@@ -107,15 +112,17 @@ function convertBlockToNode(block) {
 
 
 function buildAST(canvas, parentScope) {
-    
+    const scope = new Scope(parentScope);
+    const ast = [];
 
     const children = Array.from(canvas.children);
 
     for (const child of children) {
         ast.push({
             block_type: child.className,
-            node: convertBlockToNode(child)
+            node: convertBlockToNode(child, scope)
         })
     }
+    return ast;
 }
 
