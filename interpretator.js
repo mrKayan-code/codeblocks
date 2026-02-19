@@ -1,6 +1,6 @@
 class Scope {
-    parent
-    var_table
+    parent;
+    var_table;
 
     constructor(parent = null) {
         this.parent = parent;
@@ -54,6 +54,22 @@ class Scope {
 
 }
 
+class AST {
+    nodes;
+    scope;
+
+    constructor(parentScope) {
+        this.nodes = [];
+        this.scope = new Scope(parentScope);
+    }
+
+    push(block) {
+        this.nodes.push({
+            block_type: block.className,
+            node: convertBlockToNode(block, this.scope)
+        });
+    }
+}
 const start_button = document.getElementById('startblock');
 
 
@@ -69,14 +85,6 @@ start_button.addEventListener('click', () => {
 
 
 });
-
-// function reset() {
-//     // for (const key in global_vars) {
-//     //     delete global_vars[key];
-//     // }
-
-//     ast.length = 0;
-// }
 
 function parseExpression(expr) { //TODO(парсер выражений потом разберемся и с лог через опз)
 
@@ -112,16 +120,12 @@ function convertBlockToNode(block, scope) {
 
 
 function buildAST(canvas, parentScope) {
-    const scope = new Scope(parentScope);
-    const ast = [];
+    const ast = new AST(parentScope);
 
     const children = Array.from(canvas.children);
 
     for (const child of children) {
-        ast.push({
-            block_type: child.className,
-            node: convertBlockToNode(child, scope)
-        })
+        ast.push(child);
     }
     return ast;
 }
