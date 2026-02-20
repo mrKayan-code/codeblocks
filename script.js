@@ -40,11 +40,15 @@ function makeDroppable(element) {
             makeDraggable(clone);
             makeDroppable(clone);
             clone.querySelectorAll('.inner-slot').forEach(slot => setupSlot(slot));
+
+            setupBlockLogic(clone);
             element.insertAdjacentElement('afterend', clone);
         } else if (sourceZone === 'canvas') {
+            setupBlockLogic(element);
             element.insertAdjacentElement('afterend', draggedItem);
         }
 
+        onProgramChanged();
         draggedItem = null;
         sourceZone = null;
     });
@@ -59,19 +63,24 @@ canvas.addEventListener('dragover', function(event) {
 canvas.addEventListener('drop', function(event) {
     event.preventDefault();
 
-if (event.target === canvas) {
-        if (sourceZone === 'palette') {
-            const clone = draggedItem.cloneNode(true);
-            clone.classList.remove('palette-block')
-            makeDraggable(clone);
-            makeDroppable(clone);
-            clone.querySelectorAll('.inner-slot').forEach(slot => setupSlot(slot));
-            canvas.appendChild(clone);
-        } else if (sourceZone === 'canvas') {
-            canvas.appendChild(draggedItem);
-        }
-    }
+    if (event.target === canvas) {
+            if (sourceZone === 'palette') {
+                const clone = draggedItem.cloneNode(true);
+                clone.classList.remove('palette-block')
+                makeDraggable(clone);
+                makeDroppable(clone);
+                clone.querySelectorAll('.inner-slot').forEach(slot => setupSlot(slot));
 
+                setupBlockLogic(clone);
+                canvas.appendChild(clone);
+            } else if (sourceZone === 'canvas') {
+                setupBlockLogic(draggedItem);
+                canvas.appendChild(draggedItem);                
+            }
+        }
+    
+    
+    onProgramChanged();
     draggedItem = null;
     sourceZone = null;
 });
@@ -86,6 +95,9 @@ palette.addEventListener('drop', function(event) {
     if (sourceZone === 'canvas') {
         draggedItem.remove();
     }
+
+    onProgramChanged();
+
     draggedItem = null;
     sourceZone = null;
 }); 
@@ -118,9 +130,14 @@ function setupSlot(slot) {
         }
 
         element.classList.remove('dropped');
-        element.style.position = 'static'; 
+        element.style.position = 'static';
+
+        setupBlockLogic(element);
         slot.appendChild(element);
         
+        
+        onProgramChanged();
+
         draggedItem = null;
         sourceZone = null;
     });
@@ -137,3 +154,81 @@ start_button.addEventListener('click', () => {
 
     console.log(console.log(JSON.stringify(ast, null, 2)));
 });
+
+function setupBlockLogic(block) {
+
+    if (block.classList.contains('block-var')) {
+        const typeInput = block.querySelector('.type-input');
+        const nameInput = block.querySelector('.name-input');
+
+        if (typeInput) {
+            typeInput.addEventListener('change', onProgramChanged);
+        }
+        if (nameInput) {
+            nameInput.addEventListener('input', onProgramChanged);
+        }
+    }
+
+    if (block.classList.contains('block-assign')) {
+        const varSelect = block.querySelector('.var-input');
+        const exprInput = block.querySelector('.expr-input');
+
+        if (varSelect) {
+            varSelect.addEventListener('change', onProgramChanged);
+        }
+        if (exprInput) {
+            exprInput.addEventListener('input', onProgramChanged);
+        }
+    }
+
+    if (block.classList.contains('block-print-var')) {
+        const varSelect = block.querySelector('.var-input');
+        if (varSelect) {
+            varSelect.addEventListener('change', onProgramChanged);
+        }
+    }
+
+    //TODO(для каждого блока в будущем навесить нужные ивенты, которые будут каузить onProgramChanged)
+}
+
+function onProgramChanged() {
+    const ast = buildProgramASTFromCanvas(canvas);
+    updateVarSelectsFromAST(ast);
+}
+
+function updateVarSelectsFromAST(ast) {
+    const currentScope = ast.scope;
+
+    for (const entry of ast.nodes) {
+        const node = entry.node;
+        const block = entry.block;
+
+        if (entry.block_type === 'block-assign' || entry.block_type === 'block-print-var') {
+            const varNames = currentScope.getNameListOfVisibleVars();
+            const select = block.querySelector('.var-input');
+            if (select) {
+                fillSelectWithNames(select, varNames);
+            }
+        }
+        if (node.block_type === 'block-container') {
+            updateVarSelectsFromAST(node, node.scope);
+        }
+    }
+}
+
+function fillSelectWithNames(select, varNames) {
+    const current = select.value;
+    
+    select.innerHTML = '';
+    
+    varNames.forEach(name => {
+        const opt = document.createElement('option');
+        opt.value = name;
+        opt.textContent = name;
+        select.appendChild(opt);
+    });
+    
+    if (varNames.includes(current)) {
+        select.value = current;
+    }
+}

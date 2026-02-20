@@ -51,4 +51,18 @@ class Scope {
         return null;
     }
 
+    getNameListOfVisibleVars() {
+        const names = new Set();
+
+        let current = this;
+        while (current) {
+            for (const name in current.var_table) {
+                names.add(name);
+            }
+            current = current.parent;
+        }
+
+        return Array.from(names);
+    }
+
 }

@@ -1,3 +1,15 @@
+let currentProgramAST = null;
+
+function buildProgramASTFromCanvas(canvas) {
+    const ast = buildAST(canvas, null);
+    currentProgramAST = ast;
+    return ast;
+}
+
+function getCurrentProgramAST() {
+    return currentProgramAST;
+}
+
 class AST {
     nodes;
     scope;
@@ -10,7 +22,8 @@ class AST {
     push(block) {
         this.nodes.push({
             block_type: block.className,
-            node: convertBlockToNode(block, this.scope)
+            node: convertBlockToNode(block, this.scope),
+            block: block
         });
     }
 }
