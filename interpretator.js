@@ -71,7 +71,7 @@ class AST {
     }
 }
 
-class Expression {
+class ExpressionParser {
     tokens;
     pos;
 
@@ -88,8 +88,96 @@ class Expression {
         return this.tokens[this.pos++] || null;
     }
 
-    
-}
+    expect(type, value = null) {
+        const token = this.peek();
+        if (!token || token.type !== type || (value !== null && token.value !== value)) {
+            throw new Error(
+                `Expected ${type} ${value ?? ''}, got ${token ? token.type + ' ' + token.value : 'End Of File'}` // признаюсь, украл 
+            );
+        }
+        return this.consume();
+    }
+
+    //TODO(в ближайшем будущем добавить LogicalOr -> LogicalAnd -> Equality -> Comparison -> Expression -> Term -> Factor)
+ 
+    parse() { //точка входа потом поменяю на logicalOr
+        return this.parseExpression();
+    }
+    parseExpression() {
+        let node = this.parseTerm();
+
+        while (true) {
+            const token = this.peek();
+            if (!token || token.type !== 'op' || (token.value !== '+' && token.value !== '-')) {
+                break;
+            }
+
+            const op = this.consume().value;
+
+            const right = this.parseTerm();
+
+            node = {
+                type: 'BinaryExpr',
+                op: op,
+                left: node,
+                right: right
+            };
+        }
+
+        return node;
+    }
+
+    parseTerm() {
+        let node = this.parseFactor();
+
+        while (true) {
+            const token = this.peek();
+            if (!token || token.type !== 'op' || (token.value !== '*' && token.value !== '/')) {
+                break;
+            }
+
+            const op = this.consume().value;
+
+            const right = this.parseFactor();
+
+            node = {
+                type: 'BinaryExpr',
+                op: op,
+                left: node,
+                right: right
+            };
+        }
+
+        return node;
+    }
+
+    parseFactor() {
+        const token = this.peek();
+
+        if (!token) {
+            throw new Error('Expected factor');
+        }
+
+        switch (token.type) {
+            case 'number':
+                this.consume();
+                return {type: 'NumberLiteral', value: token.value};
+            case 'identifier':
+                this.consume(); //TODO(добавить функции + глобальные кейворды типа true false null и тд)
+                return {type: 'Var', name: token.value};
+            case 'op':
+                if (token.value === '(') {
+                    this.consume();
+                    const expr = this.parse()
+                    this.expect('op', ')')
+                    return expr;
+                }
+            default:
+                throw new Error(`Unexpected token: ${token.type} ${token.value}`);
+        }
+    }
+
+}   
 
 
 
@@ -160,7 +248,12 @@ function tokenize(expr) {
     return tokens;
 }
 
-
+function parseStringExpr(str) {
+    const tokens = tokenize(str);
+    const parser = new ExpressionParser(tokens);
+    const expr_ast = parser.parse();
+    return expr_ast;
+}
 
 const start_button = document.getElementById('startblock');
 
