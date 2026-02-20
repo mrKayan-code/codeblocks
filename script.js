@@ -125,3 +125,15 @@ function setupSlot(slot) {
         sourceZone = null;
     });
 }
+
+
+const start_button = document.getElementById('startblock');
+
+start_button.addEventListener('click', () => {
+    // reset();
+    const canvas = document.getElementById('canvas');
+
+    const ast = buildAST(canvas, null);
+
+    console.log(console.log(JSON.stringify(ast, null, 2)));
+});
