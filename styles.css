@@ -1,139 +1,445 @@
-body {
-    background-color: #121212;
-    color: #ffffff;
+/*Свещенный грааль!!!!*/
+*, *::before, *::after {
+    box-sizing: border-box;
     margin: 0;
-    padding: 15px;
-    font-family: sans-serif;
+    padding: 0;
 }
 
-#palette, #canvas {
-    box-sizing: border-box;
+body {
+    background-color: #0d0d0e;
+    color: #ffffff;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', sistem-ui, sans-serif;
+    height: 100vh;
+    list-style: 1.5;
+    display: flex;
+    flex-direction: column;
+    /* overflow: hidden; */
+}
+
+#header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    height: 56px;
+    min-height: 56px;
+    background-color: #171718;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+    z-index: 100;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+}
+
+/* 1rem это 16px он привязан к корневому элементу
+а ем это типо ребенок он будет равен значение рем, у нас типо чуть сузится*/
+
+.logo {
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: #f4f1f1;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.header-btn{
+    padding: 8px 18px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-family: inherit;
+    cursor: pointer;
+    transition:transform 0.2s ease, box-shadow 0.2s ease,
+    background-color 0.2s ease, border-color 0.2s ease;
+    user-select: none;
+    /*запрет на выделение*/
+}
+
+.header-btn:active{
+    transform: scale(0.96);
+}
+
+.Start-btn{
+    background: linear-gradient(135deg, #f0db4f 0%, #e6c93a 100%);
+    color:#1a1a1e;
+    border-color: #e6c93a;
+    box-shadow: 0 2px 10px rgba(240, 220, 80, 0.2);
+}
+
+.Start-btn:hover{
+    box-shadow: 0 4px 20px rgba(240, 220, 80, 0.4);
+    transform: translateY(-3px);
+}
+
+.Save-btn{
+    background-color: rgba(95, 165, 250, 0.12);
+    color: #93c5fd;
+    border-color: rgba(95, 165, 250, 0.24);
+}
+
+.Save-btn:hover{
+    background-color: rgba(95, 165, 250, 0.2);
+    border-color: rgba(95, 165, 250, 0.4);
+    transform: translateY(-3px);
+}
+
+.Reset-btn{
+    background-color: rgba(250, 115, 115, 0.1);
+    color: #fca5a5;
+    border-color: rgba(250, 115, 115, 0.2);
+}
+
+.Reset-btn:hover{
+    background-color: rgba(250, 115, 115, 0.18);
+    border-color: rgba(250, 115, 115, 0.36);
+    transform: translateY(-3px);
+}
+
+#workspace{
+    display: flex;
+    flex: 1;
+    overflow: hidden;
 }
 
 #palette {
-    width: 300px;
-    float: left;
-    border: 2px solid #000;
-    padding: 10px;
-    min-height: 85vh;
-    background-color: #1a1a1a;
-}
-
-#canvas { /*TODO(при половине экрана не вмещается)*/
-    margin-left: 320px;
-    margin-top: 75px;
-    width: 800px;
-    height: 400px;
-    border: 2px solid #3d3d3d;
-    /* dashed */
-    padding: 0;
-    background-color: #1e1e1e;
-    background-image: radial-gradient(#bababa 1px, transparent 1px);
-    background-size: 20px 20px;
+    width: 260px;
+    min-width: 260px;
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 16px;
+    background-color: #18181d;
     overflow-y: auto;
-    overflow-x: scroll;
 }
 
-/* скролбар дяя канвас  */
-
-#canvas::-webkit-scrollbar {
-    width: 8px;
+#palette h2{
+    font-size: 0.80rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #71717a;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-#canvas::-webkit-scrollbar-track {
-    background: #121212;
-}
-
-#canvas::-webkit-scrollbar-thumb {
-    background: #3d3d3d;
-    border-radius: 4px;
-}
-
-#canvas::-webkit-scrollbar-thumb:hover {
-    background: #fcef3c;
-}
-
-[class^="block"] {
-    background-color: #000000;
-    color: #ffffff;
-    width: 90%;
-    padding: 6px 8px;
+[class^="block"], .block {
+    background-color: #27272a;
+    color: #e4e4e6;
+    width: 100%;
+    padding: 10px 14px;
     margin-bottom: 8px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.05);
+    cursor: grab;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition:transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    user-select: none;
+}
+
+[class^="block"]:hover, .block:hover {
+    border-color: rgba(255, 255, 255, 0.12);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    transform: translateY(-1px);
+}
+
+[class^="block"]:active, .block:active {
+    cursor: grabbing;
+    transform: scale(0.98);
+}
+
+/*ИНПУТЫ*/
+
+.type-input, .name-input {
+    background-color: #1e1e1e;
+    color: #f8f8f8;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 0.8rem;
+    font-family: inherit;
+    margin-top: 4px;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+}
+
+.type-input:focus, .name-input:focus {
+    border-color: #f0db4f;
+    box-shadow: 0 0 2px rgba(240, 220, 80, 0.15);
+}
+
+.type-input option {
+    background-color: #1e1e1e;
+    color: #e4e4e7;
+}
+
+label {
+    font-size: 0.75rem;
+    color: #a1a1aa;
+    margin-right: 4px;
+}
+
+/*блокс присваивания*/
+
+.inp-block-left, .inp-block-right {
+    display: inline-block;
+    width: 60px;
+    height: 25px;
+    background-color: #1e1e1e;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 6px;
+    vertical-align: middle;
+    margin: 4px 2px;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.inp-block-left:hover, .inp-block-right:hover {
+    border-color: rgba(255,255,255,0.3);
+    background-color: rgba(255,255,255,0.03);
+}
+
+#canvas {
+    flex: 1;
+    padding: 20px;
+    background-color: #141416;
+    background-image: radial-gradient(rgba(255,255,255,0.06) 1px,
+    transparent 1px);
+    background-size: 22px 22px;
+    overflow: auto;
+    position: relative;
+}
+
+/* скролбар */
+
+#canvas::-webkit-scrollbar,
+#palette::-webkit-scrollbar,
+#counsole-output::-webkit-scrollbar{
+    width: 5px;
+}
+
+#canvas::-webkit-scrollbar-track,
+#palette::-webkit-scrollbar-track,
+#counsole-output::-webkit-scrollbar-track{
+    background: transparent;
+}
+
+#canvas::-webkit-scrollbar-thumb,
+#palette::-webkit-scrollbar-thumb,
+#counsole-output::-webkit-scrollbar-thumb{
+    background-color: #3f3f46;
+    border-radius: 100px;
+}
+
+#canvas::-webkit-scrollbar-thumb:hover,
+#palette::-webkit-scrollbar-thumb:hover,
+#counsole-output::-webkit-scrollbar-thumb:hover{
+    background: #52525b;
+}
+
+/* блоки в канвасе */
+
+#canvas [class^="block"], #canvas .block {
+    margin-bottom: 8px;
+    background-color:#2d6a3f;
+    border-color:#40917c;
+    color:#e4e4e6;
+}
+
+#canvas [class^="block"]:hover, #canvas .block:hover {
+    border-color: #52b788;
+    background-color: #357a6b;
+}
+
+/* блок контейнр */
+
+.block.block-container {
+    border: 1px solid rgba(255,255,255,0.01);
+    background-color: #2c2c2c;
+    color:#e4e4e7;
+    padding: 14px;
+    border-radius: 10px;
+    cursor: grab;
+}
+
+#canvas .block.block-container {
+    border-color: #2d6a4f;
+    background-color: #1b4332;
+}
+
+.block-header{
+    font-weight: 600;
+    font-size: 0.8rem;
+    margin-bottom: 10px;
+    pointer-events: none;
+    color:#e4e4e7;
+    background-color: #27272a;
+    padding: 5px 12px;
+    border-radius: 6px;
+    width: fit-content;
+    letter-spacing: 0.02em;
+}
+
+#canvas .block-container .block-header {
+    background-color: #2d6a4f;
+}
+
+.inner-slot {
+    background-color: rgba(0, 0, 0, 0.25);
+    border: 2px dashed rgba(255, 255, 255, 0.12);
+    min-height: 50px;
     border-radius: 8px;
+    padding: 8px;
+    display: block !important;
+    transition: background-color 0.25s ease, border-color 0.25s ease;
+}
+
+.inner-slot.drag-over {
+    background-color: rgba(240, 220, 80, 0.08);
+    border-color: #f0db4f;
 }
 
 .dropped {
     position: absolute;
-    background: #6DB65B;
-    padding: 10px;
+    background: #2d6a4f;
+    padding: 10px 14px;
+    border-color: #40917c;
 }
 
-#startblock {
-    margin-left: 320px;
-    position: absolute;
+/*консоль*/
 
-    background-color: #fcef3c;
-    color: #353535;
-    width: 200px;
-    padding: 10px 8px;
-    font-weight: bold;
-    border-radius: 8px;
-    text-align: center;
-    margin-bottom: 0;
-
-    cursor: pointer;
-    transition: all 0.3s ease;
+#console {
+    width: 280px;
+    min-width: 280px;
+    background-color: #18181d;
+    border-left: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    flex-direction: column;
 }
 
-#startblock:hover {
-    box-shadow: 0 0 15px rgba(252, 239, 60, 0.8);
-    transform: scale(1.1);
-}
-
-.block-container, .block-while{
-    border: 4px solid #000;
-    background-color: #2c2c2c;
-    color: white;
-    margin-bottom: 5px;
-    border-radius: 8px;
-    cursor: grab;
-}
-
-
-.block-header {
-    font-weight: bold;
-    margin-bottom: 8px;
-    pointer-events: none;
-    color: white;
-    display: inline;
-}
-
-
-.inner-slot {
-    background-color: rgba(0, 0, 0, 0.3);
-    border: 2px dashed rgba(255, 255, 255, 0.5);
-    min-height: 50px;
-    border-radius: 6px;
-    padding: 5px;
-    display: block !important;
-}
-
-
-.inner-slot.drag-over {
-    background-color: rgba(255, 255, 255, 0.2);
-    border-color: #fff;
-}
-
-/* #canvas [class^="block"], #canvas .block-container {
-    margin-bottom: 8px !important;
+/* .console-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; надо на будущее
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 } */
 
-.block-header {
-    width: fit-content !important;
-    background-color: #000000;
-    padding: 4px 12px;
+.console-header h2 {
+    font-size: 0.80rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #71717a;
+}
+
+.console-clear-btn {
+    background: none;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color:#71717a;
+    font-size: 0.70rem;
+    font-family: inherit;
+    padding: 3px 10px;
     border-radius: 6px;
-    margin-left: 0;
-    margin-top: 0;
-    max-width: 90%;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.console-clear-btn:hover {
+    color: #fca5a5;
+    background-color: rgba(250, 215, 215, 0.25);
+    border-color: rgba(250, 215, 215, 0.08);
+}
+
+#console-output {
+    flex: 1;
+    padding: 12px16px;
+    overflow-y: auto;
+    font-family: 'SF Mono', 'Consolas', monospace;
+    /*SF Mono   Cascadia Code   Fira Code   Consolas*/
+    font-size: 0.8rem;
+    line-height: 1.65;
+}
+
+/*строки консоли*/
+
+.console-line {
+   padding:3px 0;
+   color:#a1a1aa;
+   border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+   animation: consoleFade 0.2s ease forwards;
+   word-break: break-all;
+}
+
+.console-line.log{
+    color: #d4d4d8;
+}
+
+.console-line.info{
+    color: #93c5fd;
+}
+
+.console-line.warn{
+    color: #fde453;
+}
+
+.console-line.error{
+    color: #fa4444;
+}
+
+.console-line.success{
+    color: #64ff58;
+}
+
+/*АНИМАЦИИИИИИ*/
+
+@keyframes fadeSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+#canvas > [class^="block"],
+#canvas > .block {
+    animation: fadeSlideIn 0.3s ease forwards;
+}
+
+@keyframes consoleFade {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/*пустой канвас*/
+
+#canvas.empty::after{
+    content: "Пусто";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #71717a;
+    font-size: 0.9rem;
+    font-weight: 500;
+    pointer-events: none;
+    letter-spacing: 0.02em;
 }

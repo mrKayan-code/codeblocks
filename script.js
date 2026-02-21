@@ -3,6 +3,7 @@
 
 const canvas = document.getElementById('canvas');
 const palette = document.getElementById('palette');
+const consoleOutput = document.getElementById('console-output');
 
 let draggedItem = null;
 let sourceZone = null;  //фигни чтобы помнить что и откуда перетаскичаю
@@ -12,7 +13,6 @@ originalBlocks.forEach(block => {
     makeDraggable(block);
     block.querySelectorAll('.inner-slot').forEach(slot => setupSlot(slot));
 });
-
 
 
 function makeDraggable(element) {
@@ -93,6 +93,7 @@ palette.addEventListener('drop', function(event) {
     sourceZone = null;
 });
 
+//TODO (добавил условие чтобы в политре нельзя было вкладывать внутрь контейнера)
 
 function setupSlot(slot) {
     if (slot.closest('#palette')) return;
