@@ -206,7 +206,6 @@ function updateVarSelectsFromAST(ast) {
         if (entry.block_type === 'block-assign' || entry.block_type === 'block-print-var') {
             const varNames = currentScope.getNameListOfVisibleVars();
             const select = block.querySelector('.var-input');
-            console.log(varNames);
             if (select) {
                 fillSelectWithNames(select, varNames);
             }
