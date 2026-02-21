@@ -11,7 +11,7 @@ let sourceZone = null;  //фигни чтобы помнить что и отк�
 const originalBlocks = document.querySelectorAll('#palette [class^="block"]');
 originalBlocks.forEach(block => {
     makeDraggable(block);
-    block.querySelectorAll('.inner-slot').forEach(slot => setupSlot(slot));
+    // block.querySelectorAll('.inner-slot').forEach(slot => setupSlot(slot));
 });
 
 
@@ -96,7 +96,7 @@ palette.addEventListener('drop', function(event) {
 //TODO (добавил условие чтобы в политре нельзя было вкладывать внутрь контейнера)
 
 function setupSlot(slot) {
-    if (slot.closest('#palette')) return;
+    // if (slot.closest('#palette')) return;
     slot.addEventListener('dragover', function(event) {
         event.preventDefault();
         event.stopPropagation();

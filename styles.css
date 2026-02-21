@@ -159,7 +159,7 @@ body {
 
 /*ИНПУТЫ*/
 
-.type-input, .name-input {
+input, select {
     background-color: #1e1e1e;
     color: #f8f8f8;
     border: 1px solid rgba(255,255,255,0.1);
@@ -173,12 +173,12 @@ body {
 
 }
 
-.type-input:focus, .name-input:focus {
+input:focus, select:focus {
     border-color: #f0db4f;
     box-shadow: 0 0 2px rgba(240, 220, 80, 0.15);
 }
 
-.type-input option {
+select option{
     background-color: #1e1e1e;
     color: #e4e4e7;
 }
@@ -402,6 +402,12 @@ label {
 
 /*АНИМАЦИИИИИИ*/
 
+
+
+[class^="block"] {
+    animation: fadeSlideIn 1s ease forwards;
+}
+
 @keyframes fadeSlideIn {
     from {
         opacity: 0;
@@ -411,11 +417,6 @@ label {
         opacity: 1;
         transform: translateY(0);
     }
-}
-
-#canvas > [class^="block"],
-#canvas > .block {
-    animation: fadeSlideIn 0.3s ease forwards;
 }
 
 @keyframes consoleFade {
