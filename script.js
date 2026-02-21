@@ -95,6 +95,7 @@ palette.addEventListener('drop', function(event) {
 
 
 function setupSlot(slot) {
+    if (slot.closest('#palette')) return;
     slot.addEventListener('dragover', function(event) {
         event.preventDefault();
         event.stopPropagation();
