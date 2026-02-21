@@ -149,7 +149,7 @@ function setupSlot(slot) {
 }
 
 
-const start_button = document.getElementById('startblock');
+const start_button = document.getElementById('Start-btn');
 
 start_button.addEventListener('click', () => {
     // reset();
