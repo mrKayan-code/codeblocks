@@ -1,3 +1,6 @@
+// TODO(баг можно перетаскивать блоки в while на палитре)
+
+
 const canvas = document.getElementById('canvas');
 const palette = document.getElementById('palette');
 
@@ -53,7 +56,7 @@ function makeDroppable(element) {
 //тут логика для раб обл
 
 canvas.addEventListener('dragover', function(event) {
-    event.preventDefault(); 
+    event.preventDefault();
 });
 
 canvas.addEventListener('drop', function(event) {
@@ -62,6 +65,7 @@ canvas.addEventListener('drop', function(event) {
 if (event.target === canvas) {
         if (sourceZone === 'palette') {
             const clone = draggedItem.cloneNode(true);
+            clone.classList.remove('palette-block')
             makeDraggable(clone);
             makeDroppable(clone);
             clone.querySelectorAll('.inner-slot').forEach(slot => setupSlot(slot));
@@ -77,7 +81,7 @@ if (event.target === canvas) {
 
 
 
-// щас бахнем логику для палитры 
+// щас бахнем логику для палитры
 
 palette.addEventListener('dragover', (e) => e.preventDefault());
 palette.addEventListener('drop', function(event) {
@@ -87,9 +91,7 @@ palette.addEventListener('drop', function(event) {
     }
     draggedItem = null;
     sourceZone = null;
-}); 
-
-
+});
 
 
 function setupSlot(slot) {
@@ -119,11 +121,10 @@ function setupSlot(slot) {
         }
 
         element.classList.remove('dropped');
-        element.style.position = 'static'; 
+        element.style.position = 'static';
         slot.appendChild(element);
-        
+
         draggedItem = null;
         sourceZone = null;
     });
 }
-
