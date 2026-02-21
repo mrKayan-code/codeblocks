@@ -162,10 +162,10 @@ function setupBlockLogic(block) {
         const nameInput = block.querySelector('.name-input');
 
         if (typeInput) {
-            typeInput.addEventListener('change', onProgramChanged);
+            typeInput.addEventListener('change', onProgramChanged());
         }
         if (nameInput) {
-            nameInput.addEventListener('input', onProgramChanged);
+            nameInput.addEventListener('input', onProgramChanged());
         }
     }
 
@@ -206,12 +206,13 @@ function updateVarSelectsFromAST(ast) {
         if (entry.block_type === 'block-assign' || entry.block_type === 'block-print-var') {
             const varNames = currentScope.getNameListOfVisibleVars();
             const select = block.querySelector('.var-input');
+            console.log(varNames);
             if (select) {
                 fillSelectWithNames(select, varNames);
             }
         }
-        if (node.block_type === 'block-container') {
-            updateVarSelectsFromAST(node, node.scope);
+        if (entry.block_type === 'block-container') {
+            updateVarSelectsFromAST(node);
         }
     }
 }
