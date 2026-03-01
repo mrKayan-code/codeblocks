@@ -20,11 +20,20 @@ class AST {
     }
 
     push(block) {
-        this.nodes.push({
-            block_type: block.className,
-            node: convertBlockToNode(block, this.scope),
-            block: block
-        });
+        try {
+            this.nodes.push({
+                block_type: block.className,
+                node: convertBlockToNode(block, this.scope),
+                block: block
+            });
+        } catch (error) {
+            this.nodes.push({
+                block_type: block.className,
+                node: "Error",
+                block: block
+            })
+        }
+        
     }
 }
 

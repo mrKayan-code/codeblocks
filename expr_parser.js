@@ -19,7 +19,7 @@ class ExpressionParser {
         const token = this.peek();
         if (!token || token.type !== type || (value !== null && token.value !== value)) {
             throw new Error(
-                `Expected ${type} ${value ?? ''}, got ${token ? token.type + ' ' + token.value : 'End Of File'}` // признаюсь, украл 
+                `Expected ${type} ${value ?? ''}, got ${token ? token.type + ' ' + token.value : 'End Of File'}` 
             );
         }
         return this.consume();
