@@ -12,7 +12,7 @@ const originalBlocks = document.querySelectorAll('#palette [class^="block"]');
 originalBlocks.forEach(block => {
     makeDraggable(block);
     // block.querySelectorAll('.inner-slot').forEach(slot => setupSlot(slot)); фикс бага
-}); 
+});
 
 
 
@@ -79,14 +79,29 @@ canvas.addEventListener('drop', function(event) {
                 canvas.appendChild(clone);
             } else if (sourceZone === 'canvas') {
                 setupBlockLogic(draggedItem);
-                canvas.appendChild(draggedItem);                
+                canvas.appendChild(draggedItem);
             }
         }
-    
-    
+
+
     onProgramChanged();
     draggedItem = null;
     sourceZone = null;
+});
+
+//TODO удаление
+
+canvas.addEventListener('click', function(event) {
+    if (event.target.classList.contains('delete-btn')) {
+        const blockToRemove = event.target.closest ('[class^="block"]');
+        if (blockToRemove) {
+            blockToRemove.remove();
+
+            if (typeof onProgramChanged === 'function') {
+                onProgramChanged();
+            }
+        }
+    }
 });
 
 
@@ -104,7 +119,7 @@ palette.addEventListener('drop', function(event) {
 
     draggedItem = null;
     sourceZone = null;
-}); 
+});
 
 
 function setupSlot(slot) {
@@ -139,8 +154,8 @@ function setupSlot(slot) {
 
         setupBlockLogic(element);
         slot.appendChild(element);
-        
-        
+
+
         onProgramChanged();
 
         draggedItem = null;
@@ -223,16 +238,16 @@ function updateVarSelectsFromAST(ast) {
 
 function fillSelectWithNames(select, varNames) {
     const current = select.value;
-    
+
     select.innerHTML = '';
-    
+
     varNames.forEach(name => {
         const opt = document.createElement('option');
         opt.value = name;
         opt.textContent = name;
         select.appendChild(opt);
     });
-    
+
     if (varNames.includes(current)) {
         select.value = current;
     }
