@@ -24,7 +24,7 @@ class Scope {
 
     }
 
-    addVar(name, type, initialValue = null) {
+    addVar(name, type, initialValue = undefined) {
         if (this.hasLocal(name)) {
             return this.var_table[name];
         }
@@ -40,7 +40,7 @@ class Scope {
     setVar(name, value) {
         if (name in this.var_table) {
             this.var_table[name].value = value;
-            return var_table[name];
+            return this.var_table[name];
         }
         //TODO(добавить проверку на типы но пока так сойдет)
 

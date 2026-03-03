@@ -175,6 +175,11 @@ function tokenize(expr) {
 
 function parseStringExpr(str) {
     const tokens = tokenize(str);
+    
+    if(!tokens) {
+        return null;
+    }
+
     const parser = new ExpressionParser(tokens);
     const expr_ast = parser.parse();
     return expr_ast;

@@ -152,12 +152,24 @@ function setupSlot(slot) {
 const start_button = document.getElementById('Start-btn');
 
 start_button.addEventListener('click', () => {
-    // reset();
-    const canvas = document.getElementById('canvas');
+    consoleOutput.innerHTML = '';
+    try {
+        const ast = buildAST(canvas, null);
 
-    const ast = buildAST(canvas, null);
+        const interpretator = new Interpretator((msg) => {
+            const line = document.createElement("div");
+            line.textContent = `${msg}`;
+            consoleOutput.appendChild(line);
+        });
 
-    console.log(console.log(JSON.stringify(ast, null, 2)));
+        interpretator.run(ast);
+
+        console.log(console.log(JSON.stringify(ast, null, 2)));
+    } catch (e) {
+        consoleOutput.innerHTML += `<div style="color:red">${e.message}</div>`;
+        console.error(e);
+    }
+    
 });
 
 function setupBlockLogic(block) {
@@ -167,10 +179,10 @@ function setupBlockLogic(block) {
         const nameInput = block.querySelector('.name-input');
 
         if (typeInput) {
-            typeInput.addEventListener('change', onProgramChanged());
+            typeInput.addEventListener('change', onProgramChanged);
         }
         if (nameInput) {
-            nameInput.addEventListener('input', onProgramChanged());
+            nameInput.addEventListener('input', onProgramChanged);
         }
     }
 
