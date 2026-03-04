@@ -1,5 +1,9 @@
+// TODO(баг можно перетаскивать блоки в while на палитре)
+
+
 const canvas = document.getElementById('canvas');
 const palette = document.getElementById('palette');
+const consoleOutput = document.getElementById('console-output');
 
 let draggedItem = null;
 let sourceZone = null;  //фигни чтобы помнить что и откуда перетаскичаю
@@ -7,7 +11,7 @@ let sourceZone = null;  //фигни чтобы помнить что и отк�
 const originalBlocks = document.querySelectorAll('#palette [class^="block"]');
 originalBlocks.forEach(block => {
     makeDraggable(block);
-    block.querySelectorAll('.inner-slot').forEach(slot => setupSlot(slot));
+    // block.querySelectorAll('.inner-slot').forEach(slot => setupSlot(slot)); фикс бага
 });
 
 
@@ -40,11 +44,15 @@ function makeDroppable(element) {
             makeDraggable(clone);
             makeDroppable(clone);
             clone.querySelectorAll('.inner-slot').forEach(slot => setupSlot(slot));
+
+            setupBlockLogic(clone);
             element.insertAdjacentElement('afterend', clone);
         } else if (sourceZone === 'canvas') {
+            setupBlockLogic(element);
             element.insertAdjacentElement('afterend', draggedItem);
         }
 
+        onProgramChanged();
         draggedItem = null;
         sourceZone = null;
     });
@@ -53,31 +61,52 @@ function makeDroppable(element) {
 //тут логика для раб обл
 
 canvas.addEventListener('dragover', function(event) {
-    event.preventDefault(); 
+    event.preventDefault();
 });
 
 canvas.addEventListener('drop', function(event) {
     event.preventDefault();
 
-if (event.target === canvas) {
-        if (sourceZone === 'palette') {
-            const clone = draggedItem.cloneNode(true);
-            makeDraggable(clone);
-            makeDroppable(clone);
-            clone.querySelectorAll('.inner-slot').forEach(slot => setupSlot(slot));
-            canvas.appendChild(clone);
-        } else if (sourceZone === 'canvas') {
-            canvas.appendChild(draggedItem);
-        }
-    }
+    if (event.target === canvas) {
+            if (sourceZone === 'palette') {
+                const clone = draggedItem.cloneNode(true);
+                clone.classList.remove('palette-block')
+                makeDraggable(clone);
+                makeDroppable(clone);
+                clone.querySelectorAll('.inner-slot').forEach(slot => setupSlot(slot));
 
+                setupBlockLogic(clone);
+                canvas.appendChild(clone);
+            } else if (sourceZone === 'canvas') {
+                setupBlockLogic(draggedItem);
+                canvas.appendChild(draggedItem);
+            }
+        }
+
+
+    onProgramChanged();
     draggedItem = null;
     sourceZone = null;
 });
 
+//TODO удаление
+
+canvas.addEventListener('click', function(event) {
+    if (event.target.classList.contains('delete-btn')) {
+        const blockToRemove = event.target.closest ('[class^="block"]');
+        if (blockToRemove) {
+            blockToRemove.remove();
+
+            if (typeof onProgramChanged === 'function') {
+                onProgramChanged();
+            }
+        }
+    }
+});
 
 
-// щас бахнем логику для палитры 
+
+// щас бахнем логику для палитры
 
 palette.addEventListener('dragover', (e) => e.preventDefault());
 palette.addEventListener('drop', function(event) {
@@ -85,14 +114,16 @@ palette.addEventListener('drop', function(event) {
     if (sourceZone === 'canvas') {
         draggedItem.remove();
     }
+
+    onProgramChanged();
+
     draggedItem = null;
     sourceZone = null;
-}); 
-
-
+});
 
 
 function setupSlot(slot) {
+    // if (slot.closest('#palette')) return;
     slot.addEventListener('dragover', function(event) {
         event.preventDefault();
         event.stopPropagation();
@@ -119,11 +150,105 @@ function setupSlot(slot) {
         }
 
         element.classList.remove('dropped');
-        element.style.position = 'static'; 
+        element.style.position = 'static';
+
+        setupBlockLogic(element);
         slot.appendChild(element);
-        
+
+
+        onProgramChanged();
+
         draggedItem = null;
         sourceZone = null;
     });
 }
 
+
+const start_button = document.getElementById('Start-btn');
+
+start_button.addEventListener('click', () => {
+    // reset();
+    const canvas = document.getElementById('canvas');
+
+    const ast = buildAST(canvas, null);
+
+    console.log(console.log(JSON.stringify(ast, null, 2)));
+});
+
+function setupBlockLogic(block) {
+
+    if (block.classList.contains('block-var')) {
+        const typeInput = block.querySelector('.type-input');
+        const nameInput = block.querySelector('.name-input');
+
+        if (typeInput) {
+            typeInput.addEventListener('change', onProgramChanged());
+        }
+        if (nameInput) {
+            nameInput.addEventListener('input', onProgramChanged());
+        }
+    }
+
+    if (block.classList.contains('block-assign')) {
+        const varSelect = block.querySelector('.var-input');
+        const exprInput = block.querySelector('.expr-input');
+
+        if (varSelect) {
+            varSelect.addEventListener('change', onProgramChanged);
+        }
+        if (exprInput) {
+            exprInput.addEventListener('input', onProgramChanged);
+        }
+    }
+
+    if (block.classList.contains('block-print-var')) {
+        const varSelect = block.querySelector('.var-input');
+        if (varSelect) {
+            varSelect.addEventListener('change', onProgramChanged);
+        }
+    }
+
+    //TODO(для каждого блока в будущем навесить нужные ивенты, которые будут каузить onProgramChanged)
+}
+
+function onProgramChanged() {
+    const ast = buildProgramASTFromCanvas(canvas);
+    updateVarSelectsFromAST(ast);
+}
+
+function updateVarSelectsFromAST(ast) {
+    const currentScope = ast.scope;
+
+    for (const entry of ast.nodes) {
+        const node = entry.node;
+        const block = entry.block;
+
+        if (entry.block_type === 'block-assign' || entry.block_type === 'block-print-var') {
+            const varNames = currentScope.getNameListOfVisibleVars();
+            const select = block.querySelector('.var-input');
+            if (select) {
+                fillSelectWithNames(select, varNames);
+            }
+        }
+        if (entry.block_type === 'block-container') {
+            updateVarSelectsFromAST(node);
+        }
+    }
+}
+
+function fillSelectWithNames(select, varNames) {
+    const current = select.value;
+
+    select.innerHTML = '';
+
+    varNames.forEach(name => {
+        const opt = document.createElement('option');
+        opt.value = name;
+        opt.textContent = name;
+        select.appendChild(opt);
+    });
+
+    if (varNames.includes(current)) {
+        select.value = current;
+    }
+}
