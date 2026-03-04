@@ -27,6 +27,7 @@ class AST {
                 block: block
             });
         } catch (error) {
+            console.log(error);
             this.nodes.push({
                 block_type: block.className,
                 node: "Error",
@@ -75,7 +76,7 @@ function convertBlockToNode(block, scope) {
                 const inner_canvas = block.querySelector('.inner-slot');
                 return {
                     condition: parseStringExpr(condition),
-                    body: buildAST(inner_canvas, scope.createChild())
+                    body: buildAST(inner_canvas, scope)
                 };
             })();
         default:

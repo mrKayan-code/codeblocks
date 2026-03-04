@@ -241,9 +241,10 @@ function updateVarSelectsFromAST(ast) {
             if (select) {
                 fillSelectWithNames(select, varNames);
             }
-        }
-        if (entry.block_type === 'block-container') {
+        } else if (entry.block_type === 'block-container') {
             updateVarSelectsFromAST(node);
+        } else if (entry.block_type === 'block-while') {
+            updateVarSelectsFromAST(node.body);
         }
     }
 }

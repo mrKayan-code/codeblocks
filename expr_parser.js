@@ -175,8 +175,8 @@ function tokenize(expr) {
 
 function parseStringExpr(str) {
     const tokens = tokenize(str);
-    
-    if(!tokens) {
+
+    if(tokens.length === 0) {
         return null;
     }
 
