@@ -27,7 +27,8 @@
                 <div id = "palette">
         <h2>Палитра</h2>
 
-        <div class="block-var" draggable = "true"> var
+        <div class="block-var" draggable = "true">
+            <span class="delete-btn">&times;</span> var
             <br>
             <label for="type-input">type</label><select class="type-input" name = "type">
                 <option value="int">int</option>
@@ -38,7 +39,8 @@
             <label for="name-input">name </label><input class="name-input" type="text">
         </div>
 
-        <div class="block-assign" draggable = "true">assign
+        <div class="block-assign" draggable = "true">
+            <span class="delete-btn">&times;</span> assign
             <label for="var-input">var</label><select class="var-input" name = "var-input">
                 <option value="test1">test1</option>
                 <option value="test2">test2</option>
@@ -48,7 +50,8 @@
             <input class="expr-input" type = "text">
                                 </div>
 
-        <div class="block-print-var" draggable="true">print
+        <div class="block-print-var" draggable="true">
+            <span class="delete-btn">&times;</span> print
             <label for="var-input">var</label><select class="var-input" name = "var-input">
                 <option value="test1">test1</option>
                 <option value="test2">test2</option>
@@ -57,11 +60,13 @@
         </div>
 
         <div class ="block-while" draggable = "true">
+            <span class="delete-btn">&times;</span>
             <div class="block-header">While: </div><input class="expr-input" type="text">
 
             <div class="inner-slot">do</div>
         </div>
         <div class="block-container" draggable = "true">
+            <span class="delete-btn">&times;</span>
             <div class="block-header">Container:</div>
             <div class="inner-slot"></div>
         </div>
