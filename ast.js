@@ -45,7 +45,7 @@ function convertBlockToNode(block, scope) {
                 const name = block.querySelector('.name-input').value.trim();
                 
                 if (name !== '' && scope) {
-                    scope.addVar(name, type, null);
+                    scope.addVar(name, type, undefined);
                 } else {
                     throw new Error('Var has no name')
                 }
@@ -53,21 +53,30 @@ function convertBlockToNode(block, scope) {
                 return {type: type, name: name};
             })();
         case 'block-assign':
-            return (function() {
-                const vari = block.querySelector('.var-input').value;
+            return (function() {    
+                const name = block.querySelector('.var-input').value;
                 const expr = block.querySelector('.expr-input').value;
                 
-                return {var: vari, expr: parseStringExpr(expr)};
+                return {name: name, expr: parseStringExpr(expr)};
             })();
         case 'block-print-var':
             return (function() {
-                const vari = block.querySelector('.var-input').value;
-                return {var: vari};
+                const name = block.querySelector('.var-input').value;
+                return {name: name};
             })();
         case 'block-container':
             return (function() {
                 const inner_canvas = block.querySelector('.inner-slot');
                 return buildAST(inner_canvas, scope)
+            })();
+        case 'block-while':
+            return (function() {
+                const condition = block.querySelector('.expr-input').value;
+                const inner_canvas = block.querySelector('.inner-slot');
+                return {
+                    condition: parseStringExpr(condition),
+                    body: buildAST(inner_canvas, scope.createChild())
+                };
             })();
         default:
             return {type: undefined};
