@@ -28,8 +28,101 @@ class ExpressionParser {
     //TODO(в ближайшем будущем добавить LogicalOr -> LogicalAnd -> Equality -> Comparison -> Expression -> Term -> Factor)
  
     parse() { //точка входа потом поменяю на logicalOr
-        return this.parseExpression();
+        return this.parseLogicalOr();
     }
+
+    parseLogicalOr() {
+        let node = this.parseLogicalAnd();
+
+        while (true) {
+            const token = this.peek();
+            if (!token || token.type !== 'op' || token.value !== '||') {
+                break; 
+            }
+
+            const op = this.consume().value;
+            const right = this.parseLogicalAnd();
+
+            node = {
+                type: 'BinaryExpr',
+                op: op,
+                left: node,
+                right: right
+            };
+        }
+
+        return node;
+    }
+    
+    parseLogicalAnd() {
+        let node = this.parseEquality();
+
+        while (true) {
+            const token = this.peek();
+            if (!token || token.type !== 'op' || token.value !== '&&') {
+                break; 
+            }
+
+            const op = this.consume().value;
+            const right = this.parseEquality();
+
+            node = {
+                type: 'BinaryExpr',
+                op: op,
+                left: node,
+                right: right
+            };
+        }
+
+        return node;
+    }
+
+    parseEquality() {
+        let node = this.parseComparison();
+
+        while (true) {
+            const token = this.peek();
+            if (!token || token.type !== 'op' || (token.value !== '==' && token.value !== '!=')) {
+                break; 
+            }
+
+            const op = this.consume().value;
+            const right = this.parseComparison();
+
+            node = {
+                type: 'BinaryExpr',
+                op: op,
+                left: node,
+                right: right
+            };
+        }
+
+        return node;
+    }
+
+    parseComparison() {
+        let node = this.parseExpression();
+
+        while (true) {
+            const token = this.peek();
+            if (!token || token.type !== 'op' || (token.value !== '<' && token.value !== '>' && token.value !== '<=' && token.value !== '>=')) {
+                break; 
+            }
+
+            const op = this.consume().value;
+            const right = this.parseExpression();
+
+            node = {
+                type: 'BinaryExpr',
+                op: op,
+                left: node,
+                right: right
+            };
+        }
+
+        return node;
+    }
+
     parseExpression() {
         let node = this.parseTerm();
 
@@ -55,7 +148,7 @@ class ExpressionParser {
     }
 
     parseTerm() {
-        let node = this.parseFactor();
+        let node = this.parseUnary();
 
         while (true) {
             const token = this.peek();
@@ -65,7 +158,7 @@ class ExpressionParser {
 
             const op = this.consume().value;
 
-            const right = this.parseFactor();
+            const right = this.parseUnary();
 
             node = {
                 type: 'BinaryExpr',
@@ -78,11 +171,26 @@ class ExpressionParser {
         return node;
     }
 
+    parseUnary() {
+        const token = this.peek();
+        
+        if (token && token.type === 'op' && (token.value === '!' || token.value === '-')) {
+            const op = this.consume().value;
+            return {
+                type: "UnaryExpr",
+                op: op,
+                argument: this.parseFactor()
+            }
+        }
+
+        return this.parseFactor();
+    }
+
     parseFactor() {
         const token = this.peek();
 
         if (!token) {
-            throw new Error('Expected factor');
+            throw new Error('Expected factor Unexpected end');
         }
 
         switch (token.type) {
@@ -99,12 +207,23 @@ class ExpressionParser {
                     this.expect('op', ')')
                     return expr;
                 }
+
+                if (token.value == '[') {
+                    //TODO(массивы)
+                    throw new Error('[ is not working');
+                }
+            case 'boolean':
+                this.consume();
+                return { type: 'BooleanLiteral', value: token.value };
             default:
                 throw new Error(`Unexpected token: ${token.type} ${token.value}`);
         }
     }
 
 }   
+
+const MULTI_OPS = ['==', '!=', '>=', '<=', '&&', '||'];
+const SINGLE_OPS = '+-*/()[]=!<>';
 
 function tokenize(expr) {
     expr = expr.replace(/\s+/g, '');
@@ -150,15 +269,32 @@ function tokenize(expr) {
                 ident += expr[i];
                 i++;
             }
-
-            tokens.push({
-                type: 'identifier',
-                value: ident
-            });
+            if (ident === 'true' || ident === 'false') {
+                tokens.push({ type: 'boolean', value: ident === 'true' }); 
+            } else { 
+                tokens.push({
+                    type: 'identifier',
+                    value: ident
+                }); 
+            }
             continue;
         }
 
-        if ('+-*/()'.includes(char)) {
+        let matched = false;
+        for (const op of MULTI_OPS) {
+            if (expr.startsWith(op, i)) {
+                tokens.push({ type: 'op', value: op });
+                i += op.length;
+                matched = true;
+                break;
+            }
+        }
+        if (matched) {
+            continue;
+        }
+
+
+        if (SINGLE_OPS.includes(char)) {
             tokens.push({
                 type: 'op',
                 value: char

@@ -55,6 +55,8 @@ class Interpretator {
         switch (expr.type) {
             case 'NumberLiteral':
                 return expr.value;
+            case 'BooleanLiteral':
+                return expr.value
             case 'Var':
                 const data = scope.getVar(expr.name);
                 return data ? data.value : null;
@@ -62,23 +64,41 @@ class Interpretator {
                 const left = this.evalExpr(expr.left, scope);
                 const right = this.evalExpr(expr.right, scope);
                 return this.computeBinary(expr.op, left, right);
+            case 'UnaryExpr':
+                const argument = this.evalExpr(expr.argument, scope);
+                return this.computeUnary(expr.op, argument)
             default:
                 throw new Error(`Unknown expr type: ${expr.type}`);
         }
     }
-    
+
+    computeUnary(op, argument) {
+        switch (op) {
+            case '!': return !argument;
+            case '-': return -argument;
+
+            default: throw new Error(`Unknown operator: ${op}`);
+        }
+    }
+
     computeBinary(op, left, right) {
         switch (op) {
-            case '+': 
-                return left + right;
-            case '-': 
-                return left - right;
-            case '*': 
-                return left * right;
-            case '/': 
-                return left / right;
-            default: 
-                throw new Error(`Unknown operator: ${op}`);
+            case '+': return left + right;
+            case '-': return left - right;
+            case '*': return left * right;
+            case '/': return left / right;
+            
+            case '==': return left == right;
+            case '!=': return left != right;
+            case '<':  return left < right;
+            case '>':  return left > right;
+            case '<=': return left <= right;
+            case '>=': return left >= right;
+
+            case '&&': return left && right;
+            case '||': return left || right;
+            
+            default: throw new Error(`Unknown operator: ${op}`);
         }
     }
 }
