@@ -1,9 +1,16 @@
-// TODO(баг можно перетаскивать блоки в while на палитре)
-
+import { buildUIASTFromCanvas } from "./uiast.js";
+import { buildASTFromCanvas } from "./ast.js";
+import InterpretatorManager from "./worker_manager.js";
 
 const canvas = document.getElementById('canvas');
 const palette = document.getElementById('palette');
+const start_button = document.getElementById('Start-btn');
 const consoleOutput = document.getElementById('console-output');
+const interpretator = new InterpretatorManager((msg) => {
+            const line = document.createElement("div");
+            line.textContent = `${msg}`;
+            consoleOutput.appendChild(line);
+        })
 
 let draggedItem = null;
 let sourceZone = null;  //фигни чтобы помнить что и откуда перетаскичаю
@@ -164,22 +171,15 @@ function setupSlot(slot) {
 }
 
 
-const start_button = document.getElementById('Start-btn');
+
 
 start_button.addEventListener('click', () => {
     consoleOutput.innerHTML = '';
     try {
-        const ast = buildAST(canvas, null);
+        const ast = buildASTFromCanvas(canvas);
+        interpretator.start(ast);
 
-        const interpretator = new Interpretator((msg) => {
-            const line = document.createElement("div");
-            line.textContent = `${msg}`;
-            consoleOutput.appendChild(line);
-        });
-
-        interpretator.run(ast);
-
-        console.log(console.log(JSON.stringify(ast, null, 2)));
+        console.log(JSON.stringify(ast, null, 2));
     } catch (e) {
         consoleOutput.innerHTML += `<div style="color:red">${e.message}</div>`;
         console.error(e);
@@ -224,7 +224,7 @@ function setupBlockLogic(block) {
 }
 
 function onProgramChanged() {
-    const ast = buildProgramASTFromCanvas(canvas);
+    const ast = buildUIASTFromCanvas(canvas);
     updateVarSelectsFromAST(ast);
 }
 

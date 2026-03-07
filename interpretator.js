@@ -1,47 +1,53 @@
+import { Scope } from "./scope.js";
+
 class Interpretator {
-    constructor (console) {
-        this.console = console || console.log;
-        this.scope = null;
+    constructor () {
+        this.stopped = false;
     }
 
-    run(ast) {
-        this.scope = ast.scope;
+    run(ast, parentScope) {
+        const scope = new Scope(parentScope); //TODO(если это окажется слишком жирно создавать новый скоуп на каждой итерации вайла например, хотя оно так и должно рвботать, в будущем изменить на 1 переиспользуемый скоуп)
         for (const node of ast.nodes) {
             if (node.node === "Error") {
-                this.console(`Error in block: ${node.block_type}`);
-                return;
+                self.postMessage({
+                    type: "error",
+                    message: "Error in block: ${node.block_type}"
+                });
+                // this.console(`Error in block: ${node.block_type}`);
+                throw new Error("Stopped");
             }
-            this.execute(node.node, node.block_type);
+            this.execute(node.node, node.block_type, scope);
         }
     }
 
-    execute(node, block_type) {
+    execute(node, block_type, scope) {
         switch (block_type) {
             case 'block-var':
+                scope.addVar(node.name, node.type, undefined);
+                
                 break;
             case 'block-assign':
-                const value = this.evalExpr(node.expr);
-                this.scope.setVar(node.name, value);
+                const value = this.evalExpr(node.expr, scope);
+                scope.setVar(node.name, value);
                 break;
             case 'block-print-var':
-                const varData = this.scope.getVar(node.name);
-                this.console(varData ? varData.value : null);
+                const varData = scope.getVar(node.name);
+                self.postMessage({
+                    type: "output",
+                    message: varData ? varData.value : "null"
+                });
                 break;
             case 'block-while':
-                while (this.evalExpr(node.condition)) {
-                    const body_interpretator = new Interpretator(this.console);
-                    body_interpretator.scope = node.body.scope;
-                    body_interpretator.run(node.body);
+                while (this.evalExpr(node.condition, scope)) {
+                    this.run(node.body, scope);
                 }
                 break;
             case "block-container":
-                const body_interpretator = new Interpretator(this.console);
-                body_interpretator.scope = node.scope;
-                body_interpretator.run(node);
+                this.run(node, scope);
         }
     }
 
-    evalExpr(expr) {
+    evalExpr(expr, scope) {
         if (!expr) {
             return null;
         }
@@ -50,11 +56,11 @@ class Interpretator {
             case 'NumberLiteral':
                 return expr.value;
             case 'Var':
-                const data = this.scope.getVar(expr.name);
+                const data = scope.getVar(expr.name);
                 return data ? data.value : null;
             case 'BinaryExpr':
-                const left = this.evalExpr(expr.left);
-                const right = this.evalExpr(expr.right);
+                const left = this.evalExpr(expr.left, scope);
+                const right = this.evalExpr(expr.right, scope);
                 return this.computeBinary(expr.op, left, right);
             default:
                 throw new Error(`Unknown expr type: ${expr.type}`);
@@ -76,4 +82,16 @@ class Interpretator {
         }
     }
 }
+
+self.onmessage = function(e) {
+    const { ast } = e.data;
+    const interpretator = new Interpretator();
+    
+    try {
+        interpretator.run(ast, null);
+        self.postMessage({type: "done"});
+    } catch (error) {
+        self.postMessage({type: "error"});
+    }
+};
 

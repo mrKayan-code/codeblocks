@@ -173,7 +173,7 @@ function tokenize(expr) {
     return tokens;
 }
 
-function parseStringExpr(str) {
+export function parseStringExpr(str) {
     const tokens = tokenize(str);
 
     if(tokens.length === 0) {

@@ -1,4 +1,4 @@
-class Scope {
+export class Scope {
     parent;
     var_table;
 
@@ -12,7 +12,7 @@ class Scope {
     }
 
     getVar(name) {
-        if (name in this.var_table){
+        if (this.hasLocal(name)){
             return this.var_table[name];
         }
         
