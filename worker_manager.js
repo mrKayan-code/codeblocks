@@ -25,14 +25,29 @@ class WorkerManager {
                 this.cleanup();
                 break;
             case 'error':
-                this.output(`${message}`, 'error');
+                this.output(`${message}`);
                 this.cleanup();
                 break;
             }
         };
 
         this.worker.onerror = (e) => {
-            this.output("Worker error");
+            console.error('Worker Error', {
+                message: e.message,
+                filename: e.filename,
+                lineno: e.lineno,
+                colno: e.colno,
+                error: e.error
+            });
+            
+            this.output(`Worker error: ${e.message}`);
+            
+            this.stop();
+            
+            return true;
+            // console.log(e);
+            // this.cleanup();
+            // this.output(`worker error: ${e.}`);
         };
 
         this.worker.postMessage({ ast });

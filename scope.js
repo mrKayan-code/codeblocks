@@ -1,3 +1,5 @@
+import { typeMatch, getTypeOf } from "./types.js";
+
 export class Scope {
     parent;
     var_table;
@@ -24,32 +26,66 @@ export class Scope {
 
     }
 
-    addVar(name, type, initialValue = undefined) {
-        if (this.hasLocal(name)) {
-            return this.var_table[name];
+    addVar(name, type, initial_value = null) {
+        // if (this.hasLocal(name)) {
+        //     // return this.var_table[name];
+        // }
+
+        if (!this.isTypeCompatible(type, initial_value)) {
+            throw new Error(`type error: var '${name}' expect ${vari.type}, got ${getTypeOf(value)}`);
         }
+
+        
 
         this.var_table[name] = {
             type: type,
-            value: initialValue
+            value: initial_value
         };
         
         return this.var_table[name];
     }
 
     setVar(name, value) {
-        if (name in this.var_table) {
-            this.var_table[name].value = value;
-            return this.var_table[name];
-        }
-        //TODO(добавить проверку на типы но пока так сойдет)
+        const vari = this.getVar(name);
 
-        if (this.parent !== null) {
-            return this.parent.setVar(name, value);
+        if (!vari) {
+            throw new Error(`var is not exist: ${name}`);
         }
 
-        return null;
+        if (!this.isTypeCompatible(vari.type, value) ) {
+            throw new Error(`type error: var '${name}' expect ${vari.type}, got ${getTypeOf(value)}`);
+        }
+
+        vari.value = value;
+        return vari;
     }
+
+    setVar(name, value, type) {
+        const vari = this.getVar(name);
+
+        if (!vari) {
+            throw new Error(`var is not exist: ${name}`);
+        }
+
+        if (!typeMatch(vari.type, type) ) {
+            throw new Error(`type error: var '${name}' expect ${vari.type}, got ${type}}`);
+        }
+
+        vari.value = value;
+        return vari;
+    }
+
+    isTypeCompatible(expected_type, value) {
+        if (value === null) {
+            return true;
+        }
+
+        const actual_type = getTypeOf(value);
+
+        return typeMatch(expected_type, actual_type)        
+    }
+
+
 
     getNameListOfVisibleVars() {
         const names = new Set();
@@ -64,5 +100,4 @@ export class Scope {
 
         return Array.from(names);
     }
-
 }
