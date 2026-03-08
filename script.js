@@ -260,13 +260,24 @@ if (clear_console_button) {
 const save_button = document.getElementById('Save-btn');
 if (save_button) {
     save_button.addEventListener('click', () => {
+
         const ast = buildProgramASTFromCanvas(canvas);
         const programData = JSON.stringify(ast, null, 2);
 
-        console.log('=== СОХРАНЕНИЕ ПРОГРАММЫ ===');
-        console.log(programData);
+        const blob = new Blob([programData], { type: 'application/json' });
 
-        alert('Дерево программы собрано и выведено в консоль (F12)!'); // В будущем здесь нам надо прикрутить скачивание файла.
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+
+        a.download = '67-blocks-project.json';
+
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
+        URL.revokeObjectURL(url);
+        console.log('Файл успешно сохранен!');
     });
 }
 
