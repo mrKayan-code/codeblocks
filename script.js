@@ -234,3 +234,39 @@ start_button.addEventListener('click', () => {
     console.log(JSON.stringify(ast, null, 2));
 });
 
+//TODO локига кнопки Reset
+
+const reset_button = document.getElementById('Reset-btn');
+if (reset_button) {
+    reset_button.addEventListener('click' , () => {
+        if (confirm('Все блоки будут удалены!')) {
+            canvas.innerHTML = '';
+            onProgramChanged();
+        }
+    });
+}
+
+//TODO локига кнопки Clear очистка консоли
+
+const clear_console_button = document.getElementById('btn-clear-console');
+if (clear_console_button) {
+    clear_console_button.addEventListener('click', () => {
+        consoleOutput.innerHTML = '';
+    });
+}
+
+//TODO локига кнопки Save
+
+const save_button = document.getElementById('Save-btn');
+if (save_button) {
+    save_button.addEventListener('click', () => {
+        const ast = buildProgramASTFromCanvas(canvas);
+        const programData = JSON.stringify(ast, null, 2);
+
+        console.log('=== СОХРАНЕНИЕ ПРОГРАММЫ ===');
+        console.log(programData);
+
+        alert('Дерево программы собрано и выведено в консоль (F12)!'); // В будущем здесь нам надо прикрутить скачивание файла.
+    });
+}
+
