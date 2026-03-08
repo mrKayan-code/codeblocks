@@ -1,6 +1,3 @@
-// TODO(баг можно перетаскивать блоки в while на палитре)
-
-
 const canvas = document.getElementById('canvas');
 const palette = document.getElementById('palette');
 const consoleOutput = document.getElementById('console-output');
@@ -8,13 +5,11 @@ const consoleOutput = document.getElementById('console-output');
 let draggedItem = null;
 let sourceZone = null;  //фигни чтобы помнить что и откуда перетаскичаю
 
+
 const originalBlocks = document.querySelectorAll('#palette [class^="block"]');
 originalBlocks.forEach(block => {
     makeDraggable(block);
-    // block.querySelectorAll('.inner-slot').forEach(slot => setupSlot(slot)); фикс бага
 });
-
-
 
 function makeDraggable(element) {
     element.setAttribute('draggable', 'true');
@@ -23,7 +18,6 @@ function makeDraggable(element) {
         draggedItem = element;
         sourceZone = element.closest('#palette') ? 'palette' : 'canvas';
         event.dataTransfer.effectAllowed = sourceZone === 'palette' ? 'copy' : 'move';
-        console.log('Тащим блок:', element, 'из зоны:', sourceZone);
     });
 }
 
@@ -43,9 +37,10 @@ function makeDroppable(element) {
             const clone = draggedItem.cloneNode(true);
             makeDraggable(clone);
             makeDroppable(clone);
-            clone.querySelectorAll('.inner-slot').forEach(slot => setupSlot(slot));
 
+            clone.querySelectorAll('.inner-slot').forEach(slot => setupSlot(slot));
             setupBlockLogic(clone);
+
             element.insertAdjacentElement('afterend', clone);
         } else if (sourceZone === 'canvas') {
             setupBlockLogic(element);
@@ -58,7 +53,7 @@ function makeDroppable(element) {
     });
 }
 
-//тут логика для раб обл
+// TODO раб область
 
 canvas.addEventListener('dragover', function(event) {
     event.preventDefault();
@@ -73,57 +68,37 @@ canvas.addEventListener('drop', function(event) {
                 clone.classList.remove('palette-block')
                 makeDraggable(clone);
                 makeDroppable(clone);
-                clone.querySelectorAll('.inner-slot').forEach(slot => setupSlot(slot));
 
+                clone.querySelectorAll('.inner-slot').forEach(slot => setupSlot(slot));
                 setupBlockLogic(clone);
+
                 canvas.appendChild(clone);
             } else if (sourceZone === 'canvas') {
-                setupBlockLogic(draggedItem);
                 canvas.appendChild(draggedItem);
             }
         }
 
-
     onProgramChanged();
     draggedItem = null;
     sourceZone = null;
 });
 
-//TODO удаление
-
-canvas.addEventListener('click', function(event) {
-    if (event.target.classList.contains('delete-btn')) {
-        const blockToRemove = event.target.closest ('[class^="block"]');
-        if (blockToRemove) {
-            blockToRemove.remove();
-
-            if (typeof onProgramChanged === 'function') {
-                onProgramChanged();
-            }
-        }
-    }
-});
-
-
-
-// щас бахнем логику для палитры
+// TODO Логика удаления
 
 palette.addEventListener('dragover', (e) => e.preventDefault());
-palette.addEventListener('drop', function(event) {
+palette.addEventListener('drop', function(event){
     event.preventDefault();
-    if (sourceZone === 'canvas') {
+    if(sourceZone === 'canvas'){
         draggedItem.remove();
+        onProgramChanged();
     }
-
-    onProgramChanged();
-
     draggedItem = null;
     sourceZone = null;
 });
 
+// TODO Логика слотов контейнер
 
 function setupSlot(slot) {
-    // if (slot.closest('#palette')) return;
     slot.addEventListener('dragover', function(event) {
         event.preventDefault();
         event.stopPropagation();
@@ -139,12 +114,15 @@ function setupSlot(slot) {
         event.stopPropagation();
         slot.classList.remove('drag-over');
 
+        if (!draggedItem) return;
+
         let element;
         if (sourceZone === 'palette') {
             element = draggedItem.cloneNode(true);
             makeDraggable(element);
             makeDroppable(element);
             element.querySelectorAll('.inner-slot').forEach(s => setupSlot(s));
+            setupBlockLogic(element); // логика для влож блоков
         } else {
             element = draggedItem;
         }
@@ -152,9 +130,7 @@ function setupSlot(slot) {
         element.classList.remove('dropped');
         element.style.position = 'static';
 
-        setupBlockLogic(element);
         slot.appendChild(element);
-
 
         onProgramChanged();
 
@@ -163,17 +139,7 @@ function setupSlot(slot) {
     });
 }
 
-
-const start_button = document.getElementById('Start-btn');
-
-start_button.addEventListener('click', () => {
-    // reset();
-    const canvas = document.getElementById('canvas');
-
-    const ast = buildAST(canvas, null);
-
-    console.log(console.log(JSON.stringify(ast, null, 2)));
-});
+// TODO Логика, тут исправил обработчик на каждый блок
 
 function setupBlockLogic(block) {
 
@@ -181,42 +147,43 @@ function setupBlockLogic(block) {
         const typeInput = block.querySelector('.type-input');
         const nameInput = block.querySelector('.name-input');
 
-        if (typeInput) {
-            typeInput.addEventListener('change', onProgramChanged());
-        }
-        if (nameInput) {
-            nameInput.addEventListener('input', onProgramChanged());
-        }
+        if (typeInput) typeInput.addEventListener('change', onProgramChanged);
+        if (nameInput) nameInput.addEventListener('input', onProgramChanged); // тут как я понял если убрать скобки то оно будет вылазить по событыю а не сразу
     }
 
     if (block.classList.contains('block-assign')) {
         const varSelect = block.querySelector('.var-input');
         const exprInput = block.querySelector('.expr-input');
 
-        if (varSelect) {
-            varSelect.addEventListener('change', onProgramChanged);
-        }
-        if (exprInput) {
-            exprInput.addEventListener('input', onProgramChanged);
-        }
+        if (varSelect) varSelect.addEventListener('change', onProgramChanged);
+        if (exprInput) exprInput.addEventListener('input', onProgramChanged);
     }
 
     if (block.classList.contains('block-print-var')) {
         const varSelect = block.querySelector('.var-input');
-        if (varSelect) {
-            varSelect.addEventListener('change', onProgramChanged);
-        }
+        if (varSelect) varSelect.addEventListener('change', onProgramChanged);
     }
 
-    //TODO(для каждого блока в будущем навесить нужные ивенты, которые будут каузить onProgramChanged)
+    //TODO добавил блок while
+
+    if (block.classList.contains('block-while')) {
+        const exprInput = block.querySelector('.expr-input');
+        if (exprInput) exprInput.addEventListener('input', onProgramChanged);
+    }
 }
+
+//TODO обновил программы и аст
 
 function onProgramChanged() {
     const ast = buildProgramASTFromCanvas(canvas);
-    updateVarSelectsFromAST(ast);
+   if (ast) {
+     updateVarSelectsFromAST(ast);
+   }
 }
 
 function updateVarSelectsFromAST(ast) {
+    if (!ast || !ast.nodes) return;
+
     const currentScope = ast.scope;
 
     for (const entry of ast.nodes) {
@@ -230,8 +197,10 @@ function updateVarSelectsFromAST(ast) {
                 fillSelectWithNames(select, varNames);
             }
         }
-        if (entry.block_type === 'block-container') {
-            updateVarSelectsFromAST(node);
+        if (entry.block_type === 'block-container' || entry.block_type === 'block-while') {
+            if (node) {
+                 updateVarSelectsFromAST(node);
+            }
         }
     }
 }
@@ -250,5 +219,18 @@ function fillSelectWithNames(select, varNames) {
 
     if (varNames.includes(current)) {
         select.value = current;
+    } else if (varNames.length > 0) {
+         select.value =varNames[0];
     }
 }
+
+//TODO кнопка старт
+
+const start_button = document.getElementById('Start-btn');
+start_button.addEventListener('click', () => {
+    const canvas = document.getElementById('canvas');
+    const ast = buildProgramASTFromCanvas(canvas);
+    console.log("Текущее AST дерево:");
+    console.log(JSON.stringify(ast, null, 2));
+});
+
