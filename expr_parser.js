@@ -29,7 +29,9 @@ class ExpressionParser {
     //TODO(в ближайшем будущем добавить LogicalOr -> LogicalAnd -> Equality -> Comparison -> Expression -> Term -> Factor)
  
     parse() { //точка входа потом поменяю на logicalOr
-        return this.parseLogicalOr();
+        const exprAst =  this.parseLogicalOr();
+        
+        return exprAst;
     }
 
     parseLogicalOr() {
@@ -149,17 +151,17 @@ class ExpressionParser {
     }
 
     parseTerm() {
-        let node = this.parseUnary();
+        let node = this.parsePrefix();
 
         while (true) {
             const token = this.peek();
-            if (!token || token.type !== 'op' || (token.value !== '*' && token.value !== '/')) {
+            if (!token || token.type !== 'op' || (token.value !== '*' && token.value !== '/' && token.value !== '//' && token.value !== '%')) {
                 break;
             }
 
             const op = this.consume().value;
 
-            const right = this.parseUnary();
+            const right = this.parsePrefix();
 
             node = {
                 type: 'BinaryExpr',
@@ -172,7 +174,7 @@ class ExpressionParser {
         return node;
     }
 
-    parseUnary() {
+    parsePrefix() {
         const token = this.peek();
         
         if (token && token.type === 'op' && (token.value === '!' || token.value === '-')) {
@@ -234,5 +236,9 @@ export function parseStringExpr(str) {
 
     const parser = new ExpressionParser(tokens);
     const expr_ast = parser.parse();
+
+    if (parser.peek() != null) {
+        throw new Error(`Expression broken, ${parser.peek().type} '${parser.peek().value}' not expected`);
+    }
     return expr_ast;
 }

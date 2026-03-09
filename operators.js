@@ -61,12 +61,12 @@ export const BINARY_OPERATORS_SIGNATURES = {
     '%' : {
          signatures: [
             { args: [TYPES.INT, TYPES.INT], result_type: TYPES.INT },
-            { args: [TYPES.FLOAT, TYPES.FLOAT], result_type: TYPES.INT }
+            { args: [TYPES.FLOAT, TYPES.FLOAT], result_type: TYPES.FLOAT }
         ],
         impl: (l, r) => l % r
     },
 
-
+    
     '==': {
         signatures: [
             { args: [TYPES.ANY, TYPES.ANY], result_type: TYPES.BOOLEAN }
