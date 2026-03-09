@@ -30,33 +30,49 @@
         <div class="block-var" draggable = "true">
             <span class="delete-btn">&times;</span> var
             <br>
-            <label for="type-input">type</label><select class="type-input" name = "type">
+            <label>type</label>
+            <select class="type-input" name="type">
                 <option value="int">int</option>
                 <option value="float">float</option>
                 <option value="string">string</option>
-                <option value="boolean">bool</option>
-            </select>
+                <option value="boolean">boolean</option>
 
-            <label for="name-input">name </label><input class="name-input" type="text">
+                <option value="array<int>">array[int]</option>
+                <option value="array<float>">array[float]</option>
+                <option value="array<string>">array[string]</option>
+                <option value="array<boolean>">array[boolean]</option>
+                <option value="array<any>">array[any]</option>
+            </select>
+            
+            <label>name</label>
+            <input class="name-input" type="text">
         </div>
 
         <div class="block-assign" draggable = "true">
             <span class="delete-btn">&times;</span> assign
-            <label for="var-input">var</label><select class="var-input" name = "var-input">
-                <option value="test1">test1</option>
-                <option value="test2">test2</option>
-                <option value="test3">test3</option>
+            <label>var</label><select class="var-input">
+                <option value="test">test</option>
             </select>
                                     <label> = </label>
             <input class="expr-input" type = "text">
-                                </div>
+        </div>
+
+        <div class="block-assign-array" draggable="true">
+            <span class="delete-btn">&times;</span>
+            <label>array</label>
+            <select class="var-array-input">
+                <option value="test">test</option>
+            </select>
+            <label><==</label>
+            <input class="index-input" type="text">
+            <label> = </label>
+            <input class="expr-input" type="text">
+        </div>
 
         <div class="block-print-var" draggable="true">
             <span class="delete-btn">&times;</span> print
             <label for="var-input">var</label><select class="var-input" name = "var-input">
-                <option value="test1">test1</option>
-                <option value="test2">test2</option>
-                <option value="test3">test3</option>
+                <option value="test">test</option>
             </select>
         </div>
 

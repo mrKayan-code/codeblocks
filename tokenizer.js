@@ -1,5 +1,7 @@
 const MULTI_OPS = ['==', '!=', '>=', '<=', '&&', '||', '//'];
-const SINGLE_OPS = '+-*/()[]=!<>%';
+const SINGLE_OPS = '+-*/()[]=!<>%,';
+
+export const CONTINUE_TOKEN = '^';
 
 export function tokenize(expr) {
     expr = expr.replace(/\s+/g, '');
@@ -10,13 +12,18 @@ export function tokenize(expr) {
     while (i < expr.length) {
         const char = expr[i];
 
+        if (char === CONTINUE_TOKEN) {
+            i++;
+            continue;
+        }
+
         if (/[0-9.]/.test(char)) {
             let num = '';
             let dot = false;
 
             while (i < expr.length && /[0-9.]/.test(expr[i])) {
                 const c = expr[i];
-                
+
                 if (c === '.' && !dot) {
                     dot = true;
                 } else if(c === '.' && dot) {

@@ -1,6 +1,6 @@
 import { BINARY_OPERATORS_SIGNATURES, UNARY_OPERATORS_SIGNATURES } from "./operators.js";
 import { Scope } from "./scope.js";
-import { typeMatch, TYPES, typedValue } from "./types.js";
+import { typeMatch, TYPES, typedValue, getTypeOf, isArrayType, getArrayElementType } from "./types.js";
 class Interpretator {
     constructor () {
         this.stopped = false;
@@ -83,6 +83,26 @@ class Interpretator {
                 return typedValue(expr.value, null);
             case 'BooleanLiteral':
                 return typedValue(expr.value, TYPES.BOOLEAN);
+            case 'ArrayLiteral':
+                const elems = expr.elements.map(el => this.evalExpr(el, scope).value);
+                return typedValue(elems, getTypeOf(elems));
+            case 'IndexNotation':
+                const obj = this.evalExpr(expr.obj, scope);
+                const index = this.evalExpr(expr.index, scope);
+
+                if (!isArrayType(obj.type)) {
+                    throw new Error(`Cannot get el by index from var with type: ${obj.type}`);
+                }
+
+                if (!typeMatch(TYPES.INT, index.type)) {
+                    throw new Error(`Index must be typr int, got: ${index.type}`);
+                }
+
+                if (index.value < 0 || index.value >= obj.value.length) {
+                    throw new Error(`Index out of range: [${index.value}]`);
+                }
+
+                return typedValue(obj.value[index.value], getArrayElementType(obj.type));
             case 'Var':
                 const data = scope.getVar(expr.name);
                 if (!data) {

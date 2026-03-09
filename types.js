@@ -3,12 +3,12 @@ export const TYPES = {
     FLOAT: 'float',
     STRING: 'string',
     BOOLEAN: 'boolean',
+    ARRAY: 'array',
     ANY: 'any',
     NULL: 'null',
     UNKNOWN: 'unknown',
     NUMBER: 'number'
 };
-
 
 export function typeMatch(expected, actual) {
     if (expected === TYPES.ANY) return true;
@@ -40,6 +40,21 @@ export function getTypeOf(value) {
         return TYPES.BOOLEAN;
     }
 
+    if(Array.isArray(value)) {
+        if (value.length === 0) {
+            return makeArrayType(TYPES.ANY);
+        }
+        
+        const first_el_type = getTypeOf(value[0]);
+
+        if (value.every(item => typeMatch(first_el_type, getTypeOf(item)))) {
+            return makeArrayType(first_el_type); //TODO(проблема с массивом флоатов: если первый не число.(не ноль) или просто число без точки, а остальные флоаты, он определяет массив как any, нужен костыль сюда)
+        }
+
+        return makeArrayType(TYPES.ANY);
+
+    }
+
     return TYPES.UNKNOWN;
 }
 
@@ -48,4 +63,24 @@ export function typedValue(value, type) {
         type: type !== null ? type : getTypeOf(value),
         value: value
     };
+}
+
+export function isArrayType(type) {
+    if (!type) {
+        return false;
+    }
+
+    return type.startsWith(TYPES.ARRAY + '<');
+}
+
+export function makeArrayType(el_type) {
+    return `${TYPES.ARRAY}<${el_type}>`;
+}
+
+export function getArrayElementType(type) {
+    if (!isArrayType(type)) {
+        return null;
+    }
+    
+    return type.slice(TYPES.ARRAY.length + 1, -1);
 }

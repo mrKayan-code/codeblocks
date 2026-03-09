@@ -1,5 +1,6 @@
 import { parseStringExpr } from "./expr_parser.js";
 import { Scope } from "./scope.js";
+import { CONTINUE_TOKEN } from "./tokenizer.js";
 
 export function buildUIASTFromCanvas(canvas) {    
     return buildUIAST(canvas, null);;
@@ -54,6 +55,17 @@ function convertBlockToNode(block, scope) {
                 
                 return {name: name, expr: parseStringExpr(expr)};
             })();
+        case 'block-assign-array':
+            return (function() {
+                const array_name = block.querySelector('.var-array-input').value;
+                const index_notation = block.querySelector('.index-input').value;
+                const expr = block.querySelector('.expr-input').value;
+                
+                return {
+                    index_notation: parseStringExpr(array_name + CONTINUE_TOKEN + index_notation),
+                    value: parseStringExpr(expr)
+                };
+            })();
         case 'block-print-var':
             return (function() {
                 const name = block.querySelector('.var-input').value;
@@ -73,6 +85,7 @@ function convertBlockToNode(block, scope) {
                     body: buildUIAST(inner_canvas, scope)
                 };
             })();
+        
         default:
             return {type: undefined};
     }

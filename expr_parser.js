@@ -26,7 +26,7 @@ class ExpressionParser {
         return this.consume();
     }
 
-    //TODO(в ближайшем будущем добавить LogicalOr -> LogicalAnd -> Equality -> Comparison -> Expression -> Term -> Factor)
+    
  
     parse() { //точка входа потом поменяю на logicalOr
         const exprAst =  this.parseLogicalOr();
@@ -201,26 +201,50 @@ class ExpressionParser {
                 this.consume();
                 return {type: 'NumberLiteral', value: token.value};
             case 'identifier':
-                this.consume(); //TODO(добавить функции + глобальные кейворды типа true false null и тд)
-                return {type: 'Var', name: token.value};
+                this.consume();
+                return this.parsePostfix({type: 'Var', name: token.value});
             case 'op':
                 if (token.value === '(') {
                     this.consume();
                     const expr = this.parse()
                     this.expect('op', ')')
-                    return expr;
+                    return this.parsePostfix(expr);
                 }
 
                 if (token.value == '[') {
-                    //TODO(массивы)
-                    throw new Error('[ is not working');
+                    this.consume();
+                    const elements = [];
+
+                    elements.push(this.parse());
+
+                    while(this.peek() && this.peek().value === ',') {
+                        this.consume();
+                        elements.push(this.parse());
+                    }
+
+                    this.expect('op', ']')
+                    return this.parsePostfix({type: 'ArrayLiteral', elements: elements}); //TODO(нужно сделать нормальный эррэй литерал)
                 }
+                throw new Error(`Unexpected op: '${token.value}' in factor`);
             case 'boolean':
                 this.consume();
                 return { type: 'BooleanLiteral', value: token.value };
             default:
-                throw new Error(`Unexpected token: ${token.type} ${token.value}`);
+                throw new Error(`Unexpected ${token.type}: ${token.value}`);
         }
+    }
+
+    parsePostfix(ident) { //TODO(сюда функции)
+        let node = ident;
+
+        while(this.peek() && this.peek().value === '[') {
+            this.consume();
+            const index = this.parse();
+            this.expect('op', ']');
+            node = {type: 'IndexNotation', obj: node, index: index};
+        }
+
+        return node;
     }
 
 }   

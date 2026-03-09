@@ -1,4 +1,5 @@
 import { parseStringExpr } from "./expr_parser.js";
+import { CONTINUE_TOKEN } from "./tokenizer.js";
 
 export function buildASTFromCanvas(canvas) {
     return buildAST(canvas);
@@ -47,6 +48,17 @@ function convertBlockToNode(block) {
                 const expr = block.querySelector('.expr-input').value;
                 
                 return {name: name, expr: parseStringExpr(expr)};
+            })();
+        case 'block-assign-array':
+            return (function() {
+                const array_name = block.querySelector('.var-array-input').value;
+                const index_notation = block.querySelector('.index-input').value;
+                const expr = block.querySelector('.expr-input').value;
+                
+                return {
+                    index_notation: parseStringExpr(array_name + CONTINUE_TOKEN + index_notation),
+                    value: parseStringExpr(expr)
+                };
             })();
         case 'block-print-var':
             return (function() {
