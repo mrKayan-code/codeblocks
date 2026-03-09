@@ -1,3 +1,4 @@
+import { tokenize } from "./tokenizer.js";
 class ExpressionParser {
     tokens;
     pos;
@@ -19,7 +20,7 @@ class ExpressionParser {
         const token = this.peek();
         if (!token || token.type !== type || (value !== null && token.value !== value)) {
             throw new Error(
-                `Expected ${type} ${value ?? ''}, got ${token ? token.type + ' ' + token.value : 'End Of File'}` // признаюсь, украл 
+                `Expected ${type} ${value ?? ''}, got ${token ? token.type + ' ' + token.value : 'End Of File'}` 
             );
         }
         return this.consume();
@@ -28,8 +29,103 @@ class ExpressionParser {
     //TODO(в ближайшем будущем добавить LogicalOr -> LogicalAnd -> Equality -> Comparison -> Expression -> Term -> Factor)
  
     parse() { //точка входа потом поменяю на logicalOr
-        return this.parseExpression();
+        const exprAst =  this.parseLogicalOr();
+        
+        return exprAst;
     }
+
+    parseLogicalOr() {
+        let node = this.parseLogicalAnd();
+
+        while (true) {
+            const token = this.peek();
+            if (!token || token.type !== 'op' || token.value !== '||') {
+                break; 
+            }
+
+            const op = this.consume().value;
+            const right = this.parseLogicalAnd();
+
+            node = {
+                type: 'BinaryExpr',
+                op: op,
+                left: node,
+                right: right
+            };
+        }
+
+        return node;
+    }
+    
+    parseLogicalAnd() {
+        let node = this.parseEquality();
+
+        while (true) {
+            const token = this.peek();
+            if (!token || token.type !== 'op' || token.value !== '&&') {
+                break; 
+            }
+
+            const op = this.consume().value;
+            const right = this.parseEquality();
+
+            node = {
+                type: 'BinaryExpr',
+                op: op,
+                left: node,
+                right: right
+            };
+        }
+
+        return node;
+    }
+
+    parseEquality() {
+        let node = this.parseComparison();
+
+        while (true) {
+            const token = this.peek();
+            if (!token || token.type !== 'op' || (token.value !== '==' && token.value !== '!=')) {
+                break; 
+            }
+
+            const op = this.consume().value;
+            const right = this.parseComparison();
+
+            node = {
+                type: 'BinaryExpr',
+                op: op,
+                left: node,
+                right: right
+            };
+        }
+
+        return node;
+    }
+
+    parseComparison() {
+        let node = this.parseExpression();
+
+        while (true) {
+            const token = this.peek();
+            if (!token || token.type !== 'op' || (token.value !== '<' && token.value !== '>' && token.value !== '<=' && token.value !== '>=')) {
+                break; 
+            }
+
+            const op = this.consume().value;
+            const right = this.parseExpression();
+
+            node = {
+                type: 'BinaryExpr',
+                op: op,
+                left: node,
+                right: right
+            };
+        }
+
+        return node;
+    }
+
     parseExpression() {
         let node = this.parseTerm();
 
@@ -55,17 +151,17 @@ class ExpressionParser {
     }
 
     parseTerm() {
-        let node = this.parseFactor();
+        let node = this.parsePrefix();
 
         while (true) {
             const token = this.peek();
-            if (!token || token.type !== 'op' || (token.value !== '*' && token.value !== '/')) {
+            if (!token || token.type !== 'op' || (token.value !== '*' && token.value !== '/' && token.value !== '//' && token.value !== '%')) {
                 break;
             }
 
             const op = this.consume().value;
 
-            const right = this.parseFactor();
+            const right = this.parsePrefix();
 
             node = {
                 type: 'BinaryExpr',
@@ -78,11 +174,26 @@ class ExpressionParser {
         return node;
     }
 
+    parsePrefix() {
+        const token = this.peek();
+        
+        if (token && token.type === 'op' && (token.value === '!' || token.value === '-')) {
+            const op = this.consume().value;
+            return {
+                type: "UnaryExpr",
+                op: op,
+                argument: this.parseFactor()
+            }
+        }
+
+        return this.parseFactor();
+    }
+
     parseFactor() {
         const token = this.peek();
 
         if (!token) {
-            throw new Error('Expected factor');
+            throw new Error('Expected factor Unexpected end');
         }
 
         switch (token.type) {
@@ -99,6 +210,14 @@ class ExpressionParser {
                     this.expect('op', ')')
                     return expr;
                 }
+
+                if (token.value == '[') {
+                    //TODO(массивы)
+                    throw new Error('[ is not working');
+                }
+            case 'boolean':
+                this.consume();
+                return { type: 'BooleanLiteral', value: token.value };
             default:
                 throw new Error(`Unexpected token: ${token.type} ${token.value}`);
         }
@@ -106,76 +225,20 @@ class ExpressionParser {
 
 }   
 
-function tokenize(expr) {
-    expr = expr.replace(/\s+/g, '');
 
-    const tokens = [];
 
-    let i = 0;
-    while (i < expr.length) {
-        const char = expr[i];
+export function parseStringExpr(str) {
+    const tokens = tokenize(str);
 
-        if (/[0-9.]/.test(char)) {
-            let num = '';
-            let dot = false;
-
-            while (i < expr.length && /[0-9.]/.test(expr[i])) {
-                const c = expr[i];
-                
-                if (c === '.' && !dot) {
-                    dot = true;
-                } else if(c === '.' && dot) {
-                    throw new Error(`Invalid number literal: ${num + '..'}`);
-                }
-
-                num += c;
-                i++;
-            }
-
-            if (num === '.' || num === '') {
-                throw new Error(`Invalid number literal: ${num}`);
-            }
-
-            tokens.push({
-                type: 'number',
-                value: parseFloat(num)
-            });
-            continue;
-        }
-
-        if (/[a-zA-Z_]/.test(char)) {
-            let ident = '';
-
-            while (i < expr.length && /[a-zA-Z0-9_]/.test(expr[i])) {
-                ident += expr[i];
-                i++;
-            }
-
-            tokens.push({
-                type: 'identifier',
-                value: ident
-            });
-            continue;
-        }
-
-        if ('+-*/()'.includes(char)) {
-            tokens.push({
-                type: 'op',
-                value: char
-            });
-            i++;
-            continue;
-        }
-
-        throw new Error(`Unexpected char: '${char}'`);
+    if(tokens.length === 0) {
+        return null;
     }
 
-    return tokens;
-}
-
-function parseStringExpr(str) {
-    const tokens = tokenize(str);
     const parser = new ExpressionParser(tokens);
     const expr_ast = parser.parse();
+
+    if (parser.peek() != null) {
+        throw new Error(`Expression broken, ${parser.peek().type} '${parser.peek().value}' not expected`);
+    }
     return expr_ast;
 }

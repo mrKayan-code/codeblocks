@@ -1,41 +1,47 @@
 import { parseStringExpr } from "./expr_parser.js";
+import { Scope } from "./scope.js";
 
-export function buildASTFromCanvas(canvas) {
-    return buildAST(canvas);
+export function buildUIASTFromCanvas(canvas) {    
+    return buildUIAST(canvas, null);;
 }
 
-class AST {
+class UIAST {
     nodes;
+    scope;
 
-    constructor() {
+    constructor(parentScope) {
         this.nodes = [];
+        this.scope = new Scope(parentScope);
     }
 
     push(block) {
         try {
             this.nodes.push({
                 block_type: block.className,
-                node: convertBlockToNode(block),
+                node: convertBlockToNode(block, this.scope),
+                block: block
             });
         } catch (error) {
-            console.log(error);
             this.nodes.push({
                 block_type: block.className,
                 node: "Error",
+                block: block,
                 error: error
             });
         }
     }
 }
 
-function convertBlockToNode(block) {
+function convertBlockToNode(block, scope) {
     switch (block.className) {
         case 'block-var':
             return (function() {
                 const type = block.querySelector('.type-input').value;
                 const name = block.querySelector('.name-input').value.trim();
                 
-                if (name == '') {
+                if (name !== '' && scope) {
+                    scope.addVar(name, type, undefined);
+                } else {
                     throw new Error('Var has no name')
                 }
                 
@@ -56,7 +62,7 @@ function convertBlockToNode(block) {
         case 'block-container':
             return (function() {
                 const inner_canvas = block.querySelector('.inner-slot');
-                return buildAST(inner_canvas);
+                return buildUIAST(inner_canvas, scope)
             })();
         case 'block-while':
             return (function() {
@@ -64,7 +70,7 @@ function convertBlockToNode(block) {
                 const inner_canvas = block.querySelector('.inner-slot');
                 return {
                     condition: parseStringExpr(condition),
-                    body: buildAST(inner_canvas)
+                    body: buildUIAST(inner_canvas, scope)
                 };
             })();
         default:
@@ -72,13 +78,13 @@ function convertBlockToNode(block) {
     }
 }
 
-function buildAST(canvas) {
-    const ast = new AST();
+function buildUIAST(canvas, parentScope) {
+    const uiast = new UIAST(parentScope);
 
     const children = Array.from(canvas.children);
 
     for (const child of children) {
-        ast.push(child);
+        uiast.push(child);
     }
-    return ast;
+    return uiast;
 }

@@ -1,6 +1,12 @@
 const canvas = document.getElementById('canvas');
 const palette = document.getElementById('palette');
+const start_button = document.getElementById('Start-btn');
 const consoleOutput = document.getElementById('console-output');
+const interpretator = new InterpretatorManager((msg) => {
+            const line = document.createElement("div");
+            line.textContent = `${msg}`;
+            consoleOutput.appendChild(line);
+        })
 
 let draggedItem = null;
 let sourceZone = null;  //фигни чтобы помнить что и откуда перетаскичаю
@@ -226,7 +232,6 @@ function fillSelectWithNames(select, varNames) {
 
 //TODO кнопка старт
 
-const start_button = document.getElementById('Start-btn');
 start_button.addEventListener('click', () => {
     const canvas = document.getElementById('canvas');
     const ast = buildProgramASTFromCanvas(canvas);
