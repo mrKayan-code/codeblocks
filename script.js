@@ -1,3 +1,7 @@
+import { buildUIASTFromCanvas } from "./uiast.js";
+import { buildASTFromCanvas } from "./ast.js";
+import InterpretatorManager from "./worker_manager.js";
+
 const canvas = document.getElementById('canvas');
 const palette = document.getElementById('palette');
 const start_button = document.getElementById('Start-btn');
@@ -181,14 +185,14 @@ function setupBlockLogic(block) {
 //TODO обновил программы и аст
 
 function onProgramChanged() {
-    const ast = buildProgramASTFromCanvas(canvas);
-   if (ast) {
-     updateVarSelectsFromAST(ast);
-   }
+    const ast = buildUIASTFromCanvas(canvas);
+    if (ast) {
+        updateVarSelectsFromAST(ast);
+    }
 }
 
 function updateVarSelectsFromAST(ast) {
-    if (!ast || !ast.nodes) return;
+    if (!ast) return;
 
     const currentScope = ast.scope;
 
@@ -233,10 +237,16 @@ function fillSelectWithNames(select, varNames) {
 //TODO кнопка старт
 
 start_button.addEventListener('click', () => {
-    const canvas = document.getElementById('canvas');
-    const ast = buildProgramASTFromCanvas(canvas);
-    console.log("Текущее AST дерево:");
-    console.log(JSON.stringify(ast, null, 2));
+    consoleOutput.innerHTML = '';
+    try {
+        const ast = buildASTFromCanvas(canvas);
+        interpretator.start(ast);
+
+        console.log(JSON.stringify(ast, null, 2));
+    } catch (e) {
+        consoleOutput.innerHTML += `<div style="color:red">${e.message}</div>`;
+        console.error(e);
+    }
 });
 
 //TODO локига кнопки Reset
@@ -266,7 +276,7 @@ const save_button = document.getElementById('Save-btn');
 if (save_button) {
     save_button.addEventListener('click', () => {
 
-        const ast = buildProgramASTFromCanvas(canvas);
+        const ast = buildUIASTFromCanvas(canvas);
         const programData = JSON.stringify(ast, null, 2);
 
         const blob = new Blob([programData], { type: 'application/json' });
