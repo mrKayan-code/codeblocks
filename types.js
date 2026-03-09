@@ -23,9 +23,6 @@ export function typeMatch(expected, actual) {
     return expected === actual;
 }
 
-// export function getTypeOfArrayLiteralTemp(array) {
-
-// }
 export function getTypeOf(value) {
     if (value === null) {
         return TYPES.NULL;
@@ -83,16 +80,20 @@ export function isArrayType(type) {
     return type.startsWith(TYPES.ARRAY + '<');
 }
 
-export function makeArrayType(el_type) {
-    return `${TYPES.ARRAY}<${el_type}>`;
-}
-
-export function getArrayElementType(type) {
-    if (!isArrayType(type)) {
+export function getInfoOfArrayType(type) {
+    const match = type.match(/array<([^,]+),\s*([^>]+)>/);
+    if (!match) {
         return null;
     }
-    
-    return type.slice(TYPES.ARRAY.length + 1, -1);
+
+    return {
+        element_type:  match[1].trim(),
+        size: match[2].trim()
+    }
+}
+
+export function makeArrayType(el_type, size) {
+    return `${TYPES.ARRAY}<${el_type}, ${size}>`;
 }
 
 export function stringifyTypedValue(typed_value) {
