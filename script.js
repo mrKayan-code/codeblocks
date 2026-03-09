@@ -1,7 +1,3 @@
-import { buildUIASTFromCanvas } from "./uiast.js";
-import { buildASTFromCanvas } from "./ast.js";
-import InterpretatorManager from "./worker_manager.js";
-
 const canvas = document.getElementById('canvas');
 const palette = document.getElementById('palette');
 const start_button = document.getElementById('Start-btn');
@@ -15,13 +11,11 @@ const interpretator = new InterpretatorManager((msg) => {
 let draggedItem = null;
 let sourceZone = null;  //фигни чтобы помнить что и откуда перетаскичаю
 
+
 const originalBlocks = document.querySelectorAll('#palette [class^="block"]');
 originalBlocks.forEach(block => {
     makeDraggable(block);
-    // block.querySelectorAll('.inner-slot').forEach(slot => setupSlot(slot)); фикс бага
 });
-
-
 
 function makeDraggable(element) {
     element.setAttribute('draggable', 'true');
@@ -30,7 +24,6 @@ function makeDraggable(element) {
         draggedItem = element;
         sourceZone = element.closest('#palette') ? 'palette' : 'canvas';
         event.dataTransfer.effectAllowed = sourceZone === 'palette' ? 'copy' : 'move';
-        console.log('Тащим блок:', element, 'из зоны:', sourceZone);
     });
 }
 
@@ -50,9 +43,10 @@ function makeDroppable(element) {
             const clone = draggedItem.cloneNode(true);
             makeDraggable(clone);
             makeDroppable(clone);
-            clone.querySelectorAll('.inner-slot').forEach(slot => setupSlot(slot));
 
+            clone.querySelectorAll('.inner-slot').forEach(slot => setupSlot(slot));
             setupBlockLogic(clone);
+
             element.insertAdjacentElement('afterend', clone);
         } else if (sourceZone === 'canvas') {
             setupBlockLogic(element);
@@ -65,7 +59,7 @@ function makeDroppable(element) {
     });
 }
 
-//тут логика для раб обл
+// TODO раб область
 
 canvas.addEventListener('dragover', function(event) {
     event.preventDefault();
@@ -80,57 +74,37 @@ canvas.addEventListener('drop', function(event) {
                 clone.classList.remove('palette-block')
                 makeDraggable(clone);
                 makeDroppable(clone);
-                clone.querySelectorAll('.inner-slot').forEach(slot => setupSlot(slot));
 
+                clone.querySelectorAll('.inner-slot').forEach(slot => setupSlot(slot));
                 setupBlockLogic(clone);
+
                 canvas.appendChild(clone);
             } else if (sourceZone === 'canvas') {
-                setupBlockLogic(draggedItem);
                 canvas.appendChild(draggedItem);
             }
         }
 
-
     onProgramChanged();
     draggedItem = null;
     sourceZone = null;
 });
 
-//TODO удаление
-
-canvas.addEventListener('click', function(event) {
-    if (event.target.classList.contains('delete-btn')) {
-        const blockToRemove = event.target.closest ('[class^="block"]');
-        if (blockToRemove) {
-            blockToRemove.remove();
-
-            if (typeof onProgramChanged === 'function') {
-                onProgramChanged();
-            }
-        }
-    }
-});
-
-
-
-// щас бахнем логику для палитры
+// TODO Логика удаления
 
 palette.addEventListener('dragover', (e) => e.preventDefault());
-palette.addEventListener('drop', function(event) {
+palette.addEventListener('drop', function(event){
     event.preventDefault();
-    if (sourceZone === 'canvas') {
+    if(sourceZone === 'canvas'){
         draggedItem.remove();
+        onProgramChanged();
     }
-
-    onProgramChanged();
-
     draggedItem = null;
     sourceZone = null;
 });
 
+// TODO Логика слотов контейнер
 
 function setupSlot(slot) {
-    // if (slot.closest('#palette')) return;
     slot.addEventListener('dragover', function(event) {
         event.preventDefault();
         event.stopPropagation();
@@ -146,12 +120,15 @@ function setupSlot(slot) {
         event.stopPropagation();
         slot.classList.remove('drag-over');
 
+        if (!draggedItem) return;
+
         let element;
         if (sourceZone === 'palette') {
             element = draggedItem.cloneNode(true);
             makeDraggable(element);
             makeDroppable(element);
             element.querySelectorAll('.inner-slot').forEach(s => setupSlot(s));
+            setupBlockLogic(element); // логика для влож блоков
         } else {
             element = draggedItem;
         }
@@ -159,9 +136,7 @@ function setupSlot(slot) {
         element.classList.remove('dropped');
         element.style.position = 'static';
 
-        setupBlockLogic(element);
         slot.appendChild(element);
-
 
         onProgramChanged();
 
@@ -170,22 +145,7 @@ function setupSlot(slot) {
     });
 }
 
-
-
-
-start_button.addEventListener('click', () => {
-    consoleOutput.innerHTML = '';
-    try {
-        const ast = buildASTFromCanvas(canvas);
-        interpretator.start(ast);
-
-        console.log(JSON.stringify(ast, null, 2));
-    } catch (e) {
-        consoleOutput.innerHTML += `<div style="color:red">${e.message}</div>`;
-        console.error(e);
-    }
-    
-});
+// TODO Логика, тут исправил обработчик на каждый блок
 
 function setupBlockLogic(block) {
 
@@ -193,42 +153,43 @@ function setupBlockLogic(block) {
         const typeInput = block.querySelector('.type-input');
         const nameInput = block.querySelector('.name-input');
 
-        if (typeInput) {
-            typeInput.addEventListener('change', onProgramChanged);
-        }
-        if (nameInput) {
-            nameInput.addEventListener('input', onProgramChanged);
-        }
+        if (typeInput) typeInput.addEventListener('change', onProgramChanged);
+        if (nameInput) nameInput.addEventListener('input', onProgramChanged); // тут как я понял если убрать скобки то оно будет вылазить по событыю а не сразу
     }
 
     if (block.classList.contains('block-assign')) {
         const varSelect = block.querySelector('.var-input');
         const exprInput = block.querySelector('.expr-input');
 
-        if (varSelect) {
-            varSelect.addEventListener('change', onProgramChanged);
-        }
-        if (exprInput) {
-            exprInput.addEventListener('input', onProgramChanged);
-        }
+        if (varSelect) varSelect.addEventListener('change', onProgramChanged);
+        if (exprInput) exprInput.addEventListener('input', onProgramChanged);
     }
 
     if (block.classList.contains('block-print-var')) {
         const varSelect = block.querySelector('.var-input');
-        if (varSelect) {
-            varSelect.addEventListener('change', onProgramChanged);
-        }
+        if (varSelect) varSelect.addEventListener('change', onProgramChanged);
     }
 
-    //TODO(для каждого блока в будущем навесить нужные ивенты, которые будут каузить onProgramChanged)
+    //TODO добавил блок while
+
+    if (block.classList.contains('block-while')) {
+        const exprInput = block.querySelector('.expr-input');
+        if (exprInput) exprInput.addEventListener('input', onProgramChanged);
+    }
 }
 
+//TODO обновил программы и аст
+
 function onProgramChanged() {
-    const ast = buildUIASTFromCanvas(canvas);
-    updateVarSelectsFromAST(ast);
+    const ast = buildProgramASTFromCanvas(canvas);
+   if (ast) {
+     updateVarSelectsFromAST(ast);
+   }
 }
 
 function updateVarSelectsFromAST(ast) {
+    if (!ast || !ast.nodes) return;
+
     const currentScope = ast.scope;
 
     for (const entry of ast.nodes) {
@@ -241,10 +202,11 @@ function updateVarSelectsFromAST(ast) {
             if (select) {
                 fillSelectWithNames(select, varNames);
             }
-        } else if (entry.block_type === 'block-container') {
-            updateVarSelectsFromAST(node);
-        } else if (entry.block_type === 'block-while') {
-            updateVarSelectsFromAST(node.body);
+        }
+        if (entry.block_type === 'block-container' || entry.block_type === 'block-while') {
+            if (node) {
+                 updateVarSelectsFromAST(node);
+            }
         }
     }
 }
@@ -263,5 +225,64 @@ function fillSelectWithNames(select, varNames) {
 
     if (varNames.includes(current)) {
         select.value = current;
+    } else if (varNames.length > 0) {
+         select.value =varNames[0];
     }
 }
+
+//TODO кнопка старт
+
+start_button.addEventListener('click', () => {
+    const canvas = document.getElementById('canvas');
+    const ast = buildProgramASTFromCanvas(canvas);
+    console.log("Текущее AST дерево:");
+    console.log(JSON.stringify(ast, null, 2));
+});
+
+//TODO локига кнопки Reset
+
+const reset_button = document.getElementById('Reset-btn');
+if (reset_button) {
+    reset_button.addEventListener('click' , () => {
+        if (confirm('Все блоки будут удалены!')) {
+            canvas.innerHTML = '';
+            onProgramChanged();
+        }
+    });
+}
+
+//TODO локига кнопки Clear очистка консоли
+
+const clear_console_button = document.getElementById('btn-clear-console');
+if (clear_console_button) {
+    clear_console_button.addEventListener('click', () => {
+        consoleOutput.innerHTML = '';
+    });
+}
+
+//TODO локига кнопки Save
+
+const save_button = document.getElementById('Save-btn');
+if (save_button) {
+    save_button.addEventListener('click', () => {
+
+        const ast = buildProgramASTFromCanvas(canvas);
+        const programData = JSON.stringify(ast, null, 2);
+
+        const blob = new Blob([programData], { type: 'application/json' });
+
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+
+        a.download = '67-blocks-project.json';
+
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
+        URL.revokeObjectURL(url);
+        console.log('Файл успешно сохранен!');
+    });
+}
+
