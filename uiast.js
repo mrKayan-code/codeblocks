@@ -57,13 +57,13 @@ function convertBlockToNode(block, scope) {
             })();
         case 'block-assign-array':
             return (function() {
-                const array_name = block.querySelector('.var-array-input').value;
+                const array_name = block.querySelector('.var-input').value;
                 const index_notation = block.querySelector('.index-input').value;
                 const expr = block.querySelector('.expr-input').value;
                 
                 return {
                     index_notation: parseStringExpr(array_name + CONTINUE_TOKEN + index_notation),
-                    value: parseStringExpr(expr)
+                    expr: parseStringExpr(expr)
                 };
             })();
         case 'block-print-var':

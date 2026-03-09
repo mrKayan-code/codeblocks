@@ -106,6 +106,19 @@ palette.addEventListener('drop', function(event){
     sourceZone = null;
 });
 
+canvas.addEventListener('click', function(event) {
+    if (event.target.classList.contains('delete-btn')) {
+        const blockToRemove = event.target.closest ('[class^="block"]');
+        if (blockToRemove) {
+            blockToRemove.remove();
+
+            if (typeof onProgramChanged === 'function') {
+                onProgramChanged();
+            }
+        }
+    }
+});
+
 // TODO Логика слотов контейнер
 
 function setupSlot(slot) {
@@ -200,7 +213,7 @@ function updateVarSelectsFromAST(ast) {
         const node = entry.node;
         const block = entry.block;
 
-        if (entry.block_type === 'block-assign' || entry.block_type === 'block-print-var') {
+        if (entry.block_type === 'block-assign' || entry.block_type === 'block-print-var' || entry.block_type === 'block-assign-array') {
             const varNames = currentScope.getNameListOfVisibleVars();
             const select = block.querySelector('.var-input');
             if (select) {

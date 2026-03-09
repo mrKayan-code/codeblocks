@@ -1,4 +1,4 @@
-import { typeMatch, getTypeOf } from "./types.js";
+import { typeMatch, getTypeOf, typedValue } from "./types.js";
 
 export class Scope {
     parent;
@@ -37,10 +37,7 @@ export class Scope {
 
         
 
-        this.var_table[name] = {
-            type: type,
-            value: initial_value
-        };
+        this.var_table[name] = typedValue(initial_value, type);
         
         return this.var_table[name];
     }

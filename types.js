@@ -23,10 +23,15 @@ export function typeMatch(expected, actual) {
     return expected === actual;
 }
 
+// export function getTypeOfArrayLiteralTemp(array) {
+
+// }
 export function getTypeOf(value) {
     if (value === null) {
         return TYPES.NULL;
     }
+
+    
     
     if (typeof value === 'number') {
         return Number.isInteger(value) ? TYPES.INT : TYPES.FLOAT;
@@ -53,6 +58,11 @@ export function getTypeOf(value) {
 
         return makeArrayType(TYPES.ANY);
 
+    }
+
+    if (typeof value === 'object') {
+        return value.type;
+        
     }
 
     return TYPES.UNKNOWN;
@@ -83,4 +93,26 @@ export function getArrayElementType(type) {
     }
     
     return type.slice(TYPES.ARRAY.length + 1, -1);
+}
+
+export function stringifyTypedValue(typed_value) {
+    
+    if(isArrayType(typed_value.type)) {
+        let result = '';
+        result += '['
+
+
+        if (typed_value.value.length > 0) {
+
+            result += stringifyTypedValue(typed_value.value[0]);
+
+            for (let i = 1; i < typed_value.value.length; i++) {
+                result += ', ' +  stringifyTypedValue(typed_value.value[i]);                
+            }
+        }
+        result += ']'
+
+        return result;
+    }
+    return typed_value.value;
 }

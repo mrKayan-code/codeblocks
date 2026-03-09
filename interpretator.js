@@ -1,6 +1,6 @@
 import { BINARY_OPERATORS_SIGNATURES, UNARY_OPERATORS_SIGNATURES } from "./operators.js";
 import { Scope } from "./scope.js";
-import { typeMatch, TYPES, typedValue, getTypeOf, isArrayType, getArrayElementType } from "./types.js";
+import { typeMatch, TYPES, typedValue, getTypeOf, isArrayType, stringifyTypedValue } from "./types.js";
 class Interpretator {
     constructor () {
         this.stopped = false;
@@ -41,11 +41,23 @@ class Interpretator {
                 const typed_value = this.evalExpr(node.expr, scope);
                 scope.setVar(node.name, typed_value.value, typed_value.type);
                 break;
+            case 'block-assign-array':
+                const array_elem = this.evalExpr(node.index_notation, scope);
+                const expr = this.evalExpr(node.expr);
+
+                if (!typeMatch(array_elem.type, expr.type)) {
+                    throw new Error(`array expect ${array_elem.type}, got: ${expr.type}`);
+                }
+
+                array_elem.value = expr.value;
+                break;
             case 'block-print-var':
                 const varData = scope.getVar(node.name);
+                
                 self.postMessage({
                     type: "output",
-                    message: varData ? varData.value : "null"
+                    
+                    message: varData ? stringifyTypedValue(varData) : "null" //TODO(лютый костыль)
                 });
                 break;
             case 'block-while':
@@ -84,7 +96,7 @@ class Interpretator {
             case 'BooleanLiteral':
                 return typedValue(expr.value, TYPES.BOOLEAN);
             case 'ArrayLiteral':
-                const elems = expr.elements.map(el => this.evalExpr(el, scope).value);
+                const elems = expr.elements.map(el => this.evalExpr(el, scope));
                 return typedValue(elems, getTypeOf(elems));
             case 'IndexNotation':
                 const obj = this.evalExpr(expr.obj, scope);
@@ -102,13 +114,14 @@ class Interpretator {
                     throw new Error(`Index out of range: [${index.value}]`);
                 }
 
-                return typedValue(obj.value[index.value], getArrayElementType(obj.type));
+                return obj.value[index.value];
             case 'Var':
-                const data = scope.getVar(expr.name);
-                if (!data) {
+                const vari = scope.getVar(expr.name);
+                if (!vari) {
                     throw new Error(`Undefined var '${expr.name}'`);
                 }
-                return typedValue(data.value, data.type);
+
+                return vari;
             case 'BinaryExpr':
                 const left = this.evalExpr(expr.left, scope);
                 const right = this.evalExpr(expr.right, scope);
