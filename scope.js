@@ -31,13 +31,13 @@ export class Scope {
         //     // return this.var_table[name];
         // }
 
-        if (!this.isTypeCompatible(type, initial_value)) {
-            throw new Error(`type error: var '${name}' expect ${vari.type}, got ${getTypeOf(value)}`);
+        if (!isTypeCompatible(type, initial_value)) {
+            throw new Error(`type error: var '${name}' expect ${type}, got ${getTypeOf(initial_value)}`);
         }
 
         
 
-        this.var_table[name] = typedValue(initial_value, type);
+        this.var_table[name] = typedValue(type, initial_value);
         
         return this.var_table[name];
     }
@@ -49,7 +49,7 @@ export class Scope {
             throw new Error(`var is not exist: ${name}`);
         }
 
-        if (!this.isTypeCompatible(vari.type, value) ) {
+        if (!isTypeCompatible(vari.type, value) ) {
             throw new Error(`type error: var '${name}' expect ${vari.type}, got ${getTypeOf(value)}`);
         }
 
@@ -72,18 +72,6 @@ export class Scope {
         return vari;
     }
 
-    isTypeCompatible(expected_type, value) {
-        if (value === null) {
-            return true;
-        }
-
-        const actual_type = getTypeOf(value);
-
-        return typeMatch(expected_type, actual_type)        
-    }
-
-
-
     getNameListOfVisibleVars() {
         const names = new Set();
 
@@ -97,4 +85,14 @@ export class Scope {
 
         return Array.from(names);
     }
+}
+
+function isTypeCompatible(expected_type, value) {
+    if (value === null) {
+        return true;
+    }
+
+    const actual_type = getTypeOf(value);
+
+    return typeMatch(expected_type, actual_type)        
 }

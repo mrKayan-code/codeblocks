@@ -1,6 +1,7 @@
 import { parseStringExpr } from "./expr_parser.js";
 import { Scope } from "./scope.js";
 import { CONTINUE_TOKEN } from "./tokenizer.js";
+import { makeArrayType } from "./types.js";
 
 export function buildUIASTFromCanvas(canvas) {    
     return buildUIAST(canvas, null);;
@@ -47,6 +48,24 @@ function convertBlockToNode(block, scope) {
                 }
                 
                 return {type: type, name: name};
+            })();
+        case 'block-var-array': // TODO(пока так, мб как то нэстингом засунуть массивы в block var, там же и с вложенными массивами и типами раскидаться)
+            return (function() {
+                const name = block.querySelector('.name-input').value.trim();
+                const element_type = block.querySelector('.element-type-input').value; //TODO(точно также если добавим многомерные массивы здесь в типе еще раз вызвать convertbtn)
+                const size_expr = block.querySelector('.size-input').value;
+
+                if (name !== '' && scope) {
+                    scope.addVar(name, 'array', undefined);
+                } else {
+                    throw new Error('Var has no name')
+                }
+                
+                return {
+                    name: name,
+                    element_type: element_type,
+                    size_expr: parseStringExpr(size_expr)
+                };
             })();
         case 'block-assign':
             return (function() {    
