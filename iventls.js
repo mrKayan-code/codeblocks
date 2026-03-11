@@ -31,8 +31,10 @@ export function setupBlockLogic(block) {
         if (varSelect) varSelect.addEventListener('change', onProgramChanged);
     }
 
-
-
+    if (block.classList.contains('block-print-expr')) {
+        const exprInput = block.querySelector('.expr-input');
+        if (exprInput) exprInput.addEventListener('input', onProgramChanged);
+    }
     //TODO добавил блок while
 
     if (block.classList.contains('block-while')) {

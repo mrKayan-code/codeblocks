@@ -81,6 +81,13 @@ function convertBlockToNode(block) {
                 const name = block.querySelector('.var-input').value;
                 return {name: name};
             })();
+
+        case 'block-print-expr':
+        return (function() {
+            const expr = block.querySelector('.espr-input').value;
+            return {expr: parseStringExpr(espr)};
+        })();
+        
         case 'block-container':
             return (function() {
                 const inner_canvas = block.querySelector('.inner-slot');

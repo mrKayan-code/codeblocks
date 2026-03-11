@@ -90,6 +90,14 @@ function convertBlockToNode(block, scope) {
                 const name = block.querySelector('.var-input').value;
                 return {name: name};
             })();
+
+        case 'block-print-expr':
+            return (function() {
+                const expr = block.querySelector('.expr-input').value;
+                return {expr: parseStringExpr(expr)};
+            })();
+
+
         case 'block-container':
             return (function() {
                 const inner_canvas = block.querySelector('.inner-slot');

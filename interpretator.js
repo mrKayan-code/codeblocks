@@ -42,6 +42,7 @@ class Interpretator {
 
                 scope.addVar(node.name, tv.type, tv.value)
                 break;
+                
             case 'block-assign':
                 const typed_value = this.evalExpr(node.expr, scope);
                 scope.setVar(node.name, typed_value.value, typed_value.type);
@@ -75,6 +76,15 @@ class Interpretator {
                     message: varData ? stringifyTypedValue(varData) : "null" //TODO(лютый костыль)
                 });
                 break;
+
+            case 'block-print-expt':
+                const exprValue = this.evalExpr(node.expr, scope);
+                self.postMessage({
+                    type: "output",
+                    message: exprValue ? stringifyTypedValue(exprValue) : "null"
+                });
+                break
+
             case 'block-while':
                 const typed_predicate = this.evalExpr(node.condition, scope);
                 if (!typeMatch(TYPES.BOOLEAN, typed_predicate.type)) {
