@@ -42,6 +42,22 @@ function convertBlockToNode(block) {
                 
                 return {type: type, name: name};
             })();
+        case 'block-var-array': // TODO(пока так, мб как то нэстингом засунуть массивы в block var, там же и с вложенными массивами и типами раскидаться)
+            return (function() {
+                const name = block.querySelector('.name-input').value.trim();
+                const element_type = block.querySelector('.element-type-input').value; //TODO(точно также если добавим многомерные массивы здесь в типе еще раз вызвать convertbtn)
+                const size_expr = block.querySelector('.size-input').value;
+
+                if (name == '') {
+                    throw new Error('Var has no name')
+                }
+                
+                return {
+                    name: name,
+                    element_type: element_type,
+                    size_expr: parseStringExpr(size_expr)
+                };
+            })();
         case 'block-assign':
             return (function() {    
                 const name = block.querySelector('.var-input').value;
@@ -51,13 +67,13 @@ function convertBlockToNode(block) {
             })();
         case 'block-assign-array':
             return (function() {
-                const array_name = block.querySelector('.var-array-input').value;
+                const array_name = block.querySelector('.var-input').value;
                 const index_notation = block.querySelector('.index-input').value;
                 const expr = block.querySelector('.expr-input').value;
                 
                 return {
                     index_notation: parseStringExpr(array_name + CONTINUE_TOKEN + index_notation),
-                    value: parseStringExpr(expr)
+                    expr: parseStringExpr(expr)
                 };
             })();
         case 'block-print-var':

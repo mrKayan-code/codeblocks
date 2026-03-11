@@ -146,6 +146,19 @@ palette.addEventListener('drop', function(event){
     sourceZone = null;
 });
 
+canvas.addEventListener('click', function(event) {
+    if (event.target.classList.contains('delete-btn')) {
+        const blockToRemove = event.target.closest ('[class^="block"]');
+        if (blockToRemove) {
+            blockToRemove.remove();
+
+            if (typeof onProgramChanged === 'function') {
+                onProgramChanged();
+            }
+        }
+    }
+});
+
 // TODO Логика слотов контейнер
 
 function setupSlot(slot) {
@@ -201,6 +214,17 @@ function setupBlockLogic(block) {
         if (nameInput) nameInput.addEventListener('input', onProgramChanged); // тут как я понял если убрать скобки то оно будет вылазить по событыю а не сразу
     }
 
+    if (block.classList.contains('block-var-array')) {
+        const elementTypeInput = block.querySelector('.element-type-input');
+        const sizeInput = block.querySelector('.size-input');
+        const nameInput = block.querySelector('.name-input');
+
+        if (elementTypeInput) elementTypeInput.addEventListener('change', onProgramChanged); //TODO(добавить возможность делать многомерные массивы)
+        if (sizeInput) sizeInput.addEventListener('input', onProgramChanged);
+        if (nameInput) nameInput.addEventListener('input', onProgramChanged); // тут как я понял если убрать скобки то оно будет вылазить по событыю а не сразу
+
+    }
+
     if (block.classList.contains('block-assign')) {
         const varSelect = block.querySelector('.var-input');
         const exprInput = block.querySelector('.expr-input');
@@ -213,6 +237,8 @@ function setupBlockLogic(block) {
         const varSelect = block.querySelector('.var-input');
         if (varSelect) varSelect.addEventListener('change', onProgramChanged);
     }
+
+
 
     //TODO добавил блок while
 
@@ -240,16 +266,22 @@ function updateVarSelectsFromAST(ast) {
         const node = entry.node;
         const block = entry.block;
 
-        if (entry.block_type === 'block-assign' || entry.block_type === 'block-print-var') {
+        if (entry.block_type === 'block-assign' || entry.block_type === 'block-print-var' || entry.block_type === 'block-assign-array') {
             const varNames = currentScope.getNameListOfVisibleVars();
             const select = block.querySelector('.var-input');
             if (select) {
                 fillSelectWithNames(select, varNames);
             }
         }
-        if (entry.block_type === 'block-container' || entry.block_type === 'block-while') {
+        if (entry.block_type === 'block-container') {
             if (node) {
-                 updateVarSelectsFromAST(node);
+                updateVarSelectsFromAST(node);
+            }
+        }
+
+        if (entry.block_type === 'block-while') {
+            if (node.body) {
+                updateVarSelectsFromAST(node.body); //TODO(не менять, у них в разных местах ast лежит у whiel оно в .body )
             }
         }
     }

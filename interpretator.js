@@ -1,6 +1,6 @@
 import { BINARY_OPERATORS_SIGNATURES, UNARY_OPERATORS_SIGNATURES } from "./operators.js";
 import { Scope } from "./scope.js";
-import { typeMatch, TYPES, typedValue, getTypeOf, isArrayType, getArrayElementType } from "./types.js";
+import { typeMatch, TYPES, typedValue, getTypeOf, isArrayType, stringifyTypedValue, isComplexType, COMPLEX_TYPES, makeArrayType } from "./types.js";
 class Interpretator {
     constructor () {
         this.stopped = false;
@@ -34,18 +34,45 @@ class Interpretator {
     execute(node, block_type, scope) {
         switch (block_type) {
             case 'block-var':
-                scope.addVar(node.name, node.type, null);
+                scope.addVar(node.name, node.type, this.getDefaultValueForType(node.type));
                 
+                break;
+            case 'block-var-array': 
+                const tv = this.initArray(node, scope, this.getDefaultValueForType(node.element_type));
+
+                scope.addVar(node.name, tv.type, tv.value)
                 break;
             case 'block-assign':
                 const typed_value = this.evalExpr(node.expr, scope);
                 scope.setVar(node.name, typed_value.value, typed_value.type);
                 break;
+            case 'block-assign-array':
+                // self.postMessage({
+                //     type: "output",
+                    
+                //     message: JSON.stringify(node)
+                // });
+                const array_elem = this.evalExpr(node.index_notation, scope);               
+                const expr = this.evalExpr(node.expr, scope);
+                
+
+                if (!typeMatch(array_elem.type, expr.type)) {
+                    throw new Error(`array expect ${array_elem.type}, got: ${expr.type}`);
+                }
+
+                array_elem.value = expr.value;
+                break;
             case 'block-print-var':
                 const varData = scope.getVar(node.name);
+                // self.postMessage({
+                //     type: "output",
+                    
+                //     message: JSON.stringify(varData)
+                // });
                 self.postMessage({
                     type: "output",
-                    message: varData ? varData.value : "null"
+                    
+                    message: varData ? stringifyTypedValue(varData) : "null" //TODO(лютый костыль)
                 });
                 break;
             case 'block-while':
@@ -75,17 +102,17 @@ class Interpretator {
 
     evalExpr(expr, scope) {
         if (!expr) {
-            return typedValue(null, TYPES.NULL);
+            return typedValue(TYPES.NULL, null);
         }
 
         switch (expr.type) {
             case 'NumberLiteral':
-                return typedValue(expr.value, null);
+                return typedValue(getTypeOf(expr.value), expr.value);
             case 'BooleanLiteral':
-                return typedValue(expr.value, TYPES.BOOLEAN);
+                return typedValue(TYPES.BOOLEAN, expr.value);
             case 'ArrayLiteral':
-                const elems = expr.elements.map(el => this.evalExpr(el, scope).value);
-                return typedValue(elems, getTypeOf(elems));
+                const elems = expr.elements.map(el => this.evalExpr(el, scope));
+                return typedValue(getTypeOf(elems), elems);
             case 'IndexNotation':
                 const obj = this.evalExpr(expr.obj, scope);
                 const index = this.evalExpr(expr.index, scope);
@@ -98,17 +125,18 @@ class Interpretator {
                     throw new Error(`Index must be typr int, got: ${index.type}`);
                 }
 
-                if (index.value < 0 || index.value >= obj.value.length) {
+                if (index.value < 0 || index.value >= obj.type.size) {
                     throw new Error(`Index out of range: [${index.value}]`);
                 }
 
-                return typedValue(obj.value[index.value], getArrayElementType(obj.type));
+                return obj.value[index.value];
             case 'Var':
-                const data = scope.getVar(expr.name);
-                if (!data) {
+                const vari = scope.getVar(expr.name);
+                if (!vari) {
                     throw new Error(`Undefined var '${expr.name}'`);
                 }
-                return typedValue(data.value, data.type);
+
+                return vari;
             case 'BinaryExpr':
                 const left = this.evalExpr(expr.left, scope);
                 const right = this.evalExpr(expr.right, scope);
@@ -134,7 +162,7 @@ class Interpretator {
             throw new Error(`Operator '${op}' not supported for ${argument.type}`);
         }
 
-        return typedValue(signature.impl(argument.value), match.result_type);
+        return typedValue(match.result_type, signature.impl(argument.value));
     }
 
     computeBinary(op, left, right) {
@@ -151,7 +179,43 @@ class Interpretator {
             throw new Error(`Operator '${op}' not supported for [${left.type}, ${right.type}]`);
         }
 
-        return typedValue(signature.impl(left.value, right.value), match.result_type);
+        return typedValue(match.result_type, signature.impl(left.value, right.value));
+    }
+
+    getDefaultValueForType(type) {
+        if (!isComplexType(type)) {
+            switch (type) {
+                case TYPES.STRING: return '';
+                case TYPES.BOOLEAN: return false;
+                case TYPES.INT: return 0;
+                case TYPES.FLOAT: return 0;
+                default: return null;
+            }
+        }else {
+            if (type.complex_type === COMPLEX_TYPES.ARRAY) {
+                return this.getDefaultValueForType(type.element_type);
+            }
+        }
+        return null;
+    }
+
+    initArray(node, scope) {
+        const size_tv = this.evalExpr(node.size_expr, scope);
+
+        if (!typeMatch(TYPES.INT, size_tv.type)) {
+            throw new Error(`Size of array expect int, got: '${size_tv.type}'`);
+        }
+
+        if (size_tv.value < 1) {
+            throw new Error(`Size of array must be > 0, got: '${size_tv.value}'`);
+        }
+
+        // if (typeof node.type.element_type !== 'string') {
+        if (typeof node.element_type !== 'string') {  
+            return typedValue(makeArrayType(this.initArray(node.element_type, scope, default_val).type, size_tv.value), makeArray(size_tv.value, this.initArray(node.element_type, scope, default_val).value))
+        } else {
+            return typedValue(makeArrayType(node.element_type, size_tv.value),makeArray(size_tv.value,typedValue(node.element_type, this.getDefaultValueForType(node.element_type))));
+        }
     }
 }
 
@@ -166,4 +230,14 @@ self.onmessage = function(e) {
         self.postMessage({type: "error"});
     }
 };
+
+function makeArray(size, tv) {
+    const arr = new Array(size);
+    
+    for (let i = 0; i < size; i++) {
+        arr[i] = typedValue(tv.type, tv.value);
+    }
+    return arr;
+}
+
 

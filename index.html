@@ -37,13 +37,37 @@
                 <option value="string">string</option>
                 <option value="boolean">boolean</option>
 
-                <option value="array<int>">array[int]</option>
-                <option value="array<float>">array[float]</option>
-                <option value="array<string>">array[string]</option>
-                <option value="array<boolean>">array[boolean]</option>
-                <option value="array<any>">array[any]</option>
+                <!-- <option value="array<int>">array&lt;int&gt;</option>
+                <option value="array<float>">array&lt;float&gt;</option>
+                <option value="array<string>">array&lt;string&gt;</option>
+                <option value="array<boolean>">array&lt;boolean&gt;</option>
+                <option value="array<any>">array&lt;any&gt;</option> -->
             </select>
 
+            <label>name</label>
+            <input class="name-input" type="text">
+        </div>
+
+        <div class="block-var-array" draggable="true">
+            <span class="delete-btn">&times;</span>
+            
+            <label>array</label>
+            <label>&lt;</label>
+            
+            <select class="element-type-input">
+                <option value="int">int</option>
+                <option value="float">float</option>
+                <option value="string">string</option>
+                <option value="boolean">boolean</option>
+                <!-- <option value="array">array&lt;...&gt;</option> -->
+            </select>
+
+            <label>, </label>
+            
+            <input class="size-input" type="text">
+            
+            <label>&gt;</label>
+            
             <label>name</label>
             <input class="name-input" type="text">
         </div>
@@ -60,7 +84,7 @@
         <div class="block-assign-array" draggable="true">
             <span class="delete-btn">&times;</span>
             <label>array</label>
-            <select class="var-array-input">
+            <select class="var-input">
                 <option value="test">test</option>
             </select>
             <label><==</label>
