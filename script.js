@@ -73,11 +73,11 @@ function makeDroppable(element) {
             makeDroppable(clone);
 
             clone.querySelectorAll('.inner-slot').forEach(slot => setupSlot(slot));
-            setupBlockLogic(clone);
+            setupBlockLogic(clone, onProgramChanged);
 
             element.insertAdjacentElement('afterend', clone);
         } else if (sourceZone === 'canvas') {
-            setupBlockLogic(element);
+            setupBlockLogic(element, onProgramChange);
             element.insertAdjacentElement('afterend', draggedItem);
         }
 
@@ -98,7 +98,7 @@ canvas.addEventListener('dragover', function(event) {
             canvas.appendChild(draggedItem);
         }
         else {
-            canvas.insertBefores(draggedItem, afterElement);
+            canvas.insertBefore(draggedItem, afterElement);
         }
     }
 });
@@ -114,7 +114,7 @@ canvas.addEventListener('drop', function(event) {
                 makeDroppable(clone);
 
                 clone.querySelectorAll('.inner-slot').forEach(slot => setupSlot(slot));
-                setupBlockLogic(clone);
+                setupBlockLogic(clone, onProgramChange);
 
                 const afterElement = getDragAfterElement(canvas,event.clientY);
                 if (afterElement == null) {
@@ -125,7 +125,7 @@ canvas.addEventListener('drop', function(event) {
                 }
 
             } else if (sourceZone === 'canvas') {
-                setupBlockLogic(draggedItem);
+                setupBlockLogic(draggedItem, onProgramChange);
             }
         }
 
@@ -186,7 +186,7 @@ function setupSlot(slot) {
             makeDraggable(element);
             makeDroppable(element);
             element.querySelectorAll('.inner-slot').forEach(s => setupSlot(s));
-            setupBlockLogic(element); // логика для влож блоков
+            setupBlockLogic(element, onProgramChange); // логика для влож блоков
         } else {
             element = draggedItem;
         }
@@ -214,6 +214,7 @@ function onProgramChanged() {
         updateVarSelectsFromAST(ast);
     }
 }
+window.onProgramChange = onProgramChanged;
 
 function updateVarSelectsFromAST(ast) {
     if (!ast) return;
