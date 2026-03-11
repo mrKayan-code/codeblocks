@@ -17,7 +17,7 @@ let sourceZone = null;  //фигни чтобы помнить что и отк�
 
 // TODO Функция после сего надо вообще бросить блок
 
-function getGragAfterElement (container, y) {
+function getDragAfterElement (container, y) {
     const draggableElement = [...container.querySelectorAll('[class^="block"]:not(.dragging), .block:not(.dragging)')];
     return draggableElement.reduce((closest, child) => {
         const box = child.getBoundingClientRect();
@@ -44,7 +44,14 @@ function makeDraggable(element) {
         draggedItem = element;
         sourceZone = element.closest('#palette') ? 'palette' : 'canvas';
         event.dataTransfer.effectAllowed = sourceZone === 'palette' ? 'copy' : 'move';
+
+        setTimeout(() => element.classList.add('dragging'), 0);
     });
+
+    element.addEventListener('dragend',function(){
+        element.classList.remove('dragging');
+        draggedItem = null;
+    })
 }
 
 function makeDroppable(element) {
@@ -83,6 +90,16 @@ function makeDroppable(element) {
 
 canvas.addEventListener('dragover', function(event) {
     event.preventDefault();
+
+    if (sourceZone === 'canvas' && draggedItem) {
+        const afterElement = getDragAfterElement(canvas, event.clientY);
+        if(afterElement == null) {
+            canvas.appendChild(draggedItem);
+        }
+        else {
+            canvas.insertBefores(draggedItem, afterElement);
+        }
+    }
 });
 
 canvas.addEventListener('drop', function(event) {
@@ -98,9 +115,16 @@ canvas.addEventListener('drop', function(event) {
                 clone.querySelectorAll('.inner-slot').forEach(slot => setupSlot(slot));
                 setupBlockLogic(clone);
 
-                canvas.appendChild(clone);
+                const afterElement = getDragAfterElement(canvas,event.clientY);
+                if (afterElement == null) {
+                    canvas.appendChild(clone);
+                }
+                else {
+                    canvas.insertBefore(clone,afterElement);
+                }
+
             } else if (sourceZone === 'canvas') {
-                canvas.appendChild(draggedItem);
+                setupBlockLogic(draggedItem);
             }
         }
 
