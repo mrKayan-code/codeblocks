@@ -112,6 +112,17 @@ function convertBlockToNode(block, scope) {
                     body: buildUIAST(inner_canvas, scope)
                 };
             })();
+
+         case 'block-if':
+                    return (function() {
+                        const condition = block.querySelector('.expr-input').value;
+                        const slots = block.querySelector('.inner-slot');
+                        return {
+                            condition: parseStringExpr(condition),
+                            body: buildAST(slots[0], scope),
+                            else_body:buildAST(slots[1], scope)
+                        };
+                    })();
         
         default:
             return {type: undefined};

@@ -102,6 +102,18 @@ function convertBlockToNode(block) {
                     body: buildAST(inner_canvas)
                 };
             })();
+
+        case 'block-if':
+            return (function() {
+                const condition = block.querySelector('.expr-input').value;
+                const slots = block.querySelector('.inner-slot');
+                return {
+                    condition: parseStringExpr(condition),
+                    body: buildAST(slots[0]),
+                    else_body:buildAST(slots[1])
+                };
+            })();
+
         default:
             return {type: undefined};
     }

@@ -48,4 +48,9 @@ export function setupBlockLogic(block) {
         const exprInput = block.querySelector('.expr-input');
         if (exprInput) exprInput.addEventListener('input', triggerUpdate);
     }
+
+    if (block.classList.contains('block-if')) {
+        const exprInput = block.querySelector('.expr-input');
+        if (exprInput) exprInput.addEventListener('input', triggerUpdate);
+    }
 }

@@ -107,6 +107,21 @@ class Interpretator {
                 break;
             case "block-container":
                 this.run(node, scope);
+
+            case 'block-if':
+                const if_predicate = this.evalExpr(node.condition, scope);
+
+                if (!typeMatch(TYPES.BOOLEAN, if_predicate.type)) {
+                    throw new Error(`If condition expected boolean, got ${if_predicate.type}`);
+                }
+
+                if (if_predicate.value) {
+                    this.run(node.body, scope);
+                } else if (node.else_body) {
+                    this.run(node.else_body, scope);
+                }
+
+                break;
         }
     }
 

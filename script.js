@@ -238,9 +238,12 @@ function updateVarSelectsFromAST(ast) {
             }
         }
 
-        if (entry.block_type === 'block-while') {
+        if (entry.block_type === 'block-while' || entry.block_type === 'block-if') {
             if (node.body) {
                 updateVarSelectsFromAST(node.body); //TODO(не менять, у них в разных местах ast лежит у whiel оно в .body )
+            }
+            if (node.else_body) {
+                updateVarSelectsFromAST(node.else_body);
             }
         }
     }
