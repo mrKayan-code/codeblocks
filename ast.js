@@ -109,8 +109,8 @@ function convertBlockToNode(block) {
                 const slots = block.querySelector('.inner-slot');
                 return {
                     condition: parseStringExpr(condition),
-                    body: buildAST(slots[0]),
-                    else_body:buildAST(slots[1])
+                    body: slots[0] ? buildAST(slots[0]) : null,
+                    else_body:slots[1] ? buildAST(slots[1]) : null
                 };
             })();
 

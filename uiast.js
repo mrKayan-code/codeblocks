@@ -119,8 +119,8 @@ function convertBlockToNode(block, scope) {
                         const slots = block.querySelector('.inner-slot');
                         return {
                             condition: parseStringExpr(condition),
-                            body: buildAST(slots[0], scope),
-                            else_body:buildAST(slots[1], scope)
+                            body: slots[0] ? buildAST(slots[0], scope) : null,
+                            else_body:slots[1] ? buildAST(slots[1], scope) : null
                         };
                     })();
         
