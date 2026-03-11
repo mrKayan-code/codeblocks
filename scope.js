@@ -82,7 +82,7 @@ export class Scope {
 
         const actual_type = getTypeOf(value);
 
-        return typeMatch(expected_type, actual_type)        
+        return typeMatch(expected_type, actual_type)
     }
 
 
