@@ -93,7 +93,7 @@ class Interpretator {
                     }
 
                     this.run(node.body, scope);
-                }                
+                }
                 break;
             case "block-container":
                 this.run(node, scope);
