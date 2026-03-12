@@ -1,14 +1,30 @@
-export function setupBlockLogic(block, trigger_update) {
+import { makeBlockDroppable, makeSlotDroppable } from "./drop_manager.js";
 
-    // const triggerUpdate = () => {
-    //     if (typeof window.onProgramChanged === 'function') {
-    //         window.onProgramChanged();
-    //     }
-    // };
+export function activateBlock(block, trigger_update) {
+    setupBlockLogic(block, trigger_update);
     
-    if (typeof trigger_update !== 'function') {
-        console.log('wtf');
-    }
+    block.querySelectorAll('.inner-slot').forEach(slot => setupSlot(slot, trigger_update));
+
+    makeBlockDroppable(block, trigger_update);
+
+}
+
+function setupSlot(slot, trigger_update) {
+    slot.addEventListener('dragover', function(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        slot.classList.add('drag-over');
+    });
+
+    slot.addEventListener('dragleave', function() {
+        slot.classList.remove('drag-over');
+    });
+
+    makeSlotDroppable(slot, trigger_update)
+
+}
+
+function setupBlockLogic(block, trigger_update) {
 
     if (block.classList.contains('block-var')) {
         const typeInput = block.querySelector('.type-input');
@@ -57,4 +73,5 @@ export function setupBlockLogic(block, trigger_update) {
         const exprInput = block.querySelector('.expr-input');
         if (exprInput) exprInput.addEventListener('input', trigger_update);
     }
+
 }

@@ -1,208 +1,194 @@
 import { buildUIASTFromCanvas } from "./uiast.js";
 import { buildASTFromCanvas } from "./ast.js";
 import InterpretatorManager from "./worker_manager.js";
-import { setupBlockLogic } from "./iventls.js";
-import { onProgramChanged } from "./program_state.js";
+import { makeDraggablePaletteBlock } from "./drag_and_drop/dragstart_manager.js";
+import { makeCanvasDroppable, makePaletteDroppable} from "./drag_and_drop/drop_manager.js";
 
 const canvas = document.getElementById('canvas');
 const palette = document.getElementById('palette');
 const start_button = document.getElementById('Start-btn');
 const consoleOutput = document.getElementById('console-output');
+
 const interpretator = new InterpretatorManager((msg) => {
             const line = document.createElement("div");
             line.textContent = `${msg}`;
             consoleOutput.appendChild(line);
         })
 
-let draggedItem = null;
-let sourceZone = null;  //фигни чтобы помнить что и откуда перетаскичаю
+// let draggedItem = null;
+// let sourceZone = null;  //фигни чтобы помнить что и откуда перетаскичаю
 
 // TODO Функция после сего надо вообще бросить блок
 
-function getDragAfterElement (container, y) {
-    const draggableElement = [...container.querySelectorAll('[class^="block"]:not(.dragging), .block:not(.dragging)')];
-    return draggableElement.reduce((closest, child) => {
-        const box = child.getBoundingClientRect();
-        const offset = y - box.top - box.height / 2;
+// function getDragAfterElement (container, y) {
+//     const draggableElement = [...container.querySelectorAll('[class^="block"]:not(.dragging), .block:not(.dragging)')];
+//     return draggableElement.reduce((closest, child) => {
+//         const box = child.getBoundingClientRect();
+//         const offset = y - box.top - box.height / 2;
 
-        if (offset < 0 && offset > closest.offset) {
-            return {offset: offset, element: child};
-        } else {
-            return closest;
-        }
-    }, {offset: Number.NEGATIVE_INFINITY}).element;
-}
+//         if (offset < 0 && offset > closest.offset) {
+//             return {offset: offset, element: child};
+//         } else {
+//             return closest;
+//         }
+//     }, {offset: Number.NEGATIVE_INFINITY}).element;
+// }
 
 
 const originalBlocks = document.querySelectorAll('#palette [class^="block"]');
 originalBlocks.forEach(block => {
-    makeDraggable(block);
+    makeDraggablePaletteBlock(block, onProgramChanged);
 });
 
-function makeDraggable(element) {
-    element.setAttribute('draggable', 'true');
-    element.addEventListener ('dragstart', function(event) {
-        event.stopPropagation();
-        draggedItem = element;
-        sourceZone = element.closest('#palette') ? 'palette' : 'canvas';
-        event.dataTransfer.effectAllowed = sourceZone === 'palette' ? 'copy' : 'move';
+makeCanvasDroppable(canvas, onProgramChanged);
 
-        setTimeout(() => element.classList.add('dragging'), 0);
-    });
+makePaletteDroppable(palette, onProgramChanged);
 
-    element.addEventListener('dragend',function(){
-        element.classList.remove('dragging');
-        draggedItem = null;
-    })
-}
+// function makeDroppable(element) {
+//     // element.addEventListener('dragover', function(event) {
+//     //     event.preventDefault();
+//     //     event.stopPropagation();
+//     // });
 
-function makeDroppable(element) {
-    element.addEventListener('dragover', function(event) {
-        event.preventDefault();
-        event.stopPropagation();
-    });
+//     element.addEventListener('drop', function(event){
+//         event.preventDefault();
+//         event.stopPropagation();
 
-    element.addEventListener('drop', function(event){
-        event.preventDefault();
-        event.stopPropagation();
+//         if (!draggedItem) return;
 
-        if (!draggedItem) return;
+//         if (sourceZone === 'palette') {
+//             const clone = draggedItem.cloneNode(true);
+//             makeDraggable(clone);
+//             makeDroppable(clone);
 
-        if (sourceZone === 'palette') {
-            const clone = draggedItem.cloneNode(true);
-            makeDraggable(clone);
-            makeDroppable(clone);
+//             clone.querySelectorAll('.inner-slot').forEach(slot => setupSlot(slot));
+//             setupBlockLogic(clone, onProgramChanged);
 
-            clone.querySelectorAll('.inner-slot').forEach(slot => setupSlot(slot));
-            setupBlockLogic(clone, onProgramChanged);
+//             element.insertAdjacentElement('afterend', clone);
+//         } else if (sourceZone === 'canvas') {
+//             setupBlockLogic(element, onProgramChanged);
+//             element.insertAdjacentElement('afterend', draggedItem);
+//         }
 
-            element.insertAdjacentElement('afterend', clone);
-        } else if (sourceZone === 'canvas') {
-            setupBlockLogic(element, onProgramChanged);
-            element.insertAdjacentElement('afterend', draggedItem);
-        }
-
-        onProgramChanged();
-        draggedItem = null;
-        sourceZone = null;
-    });
-}
+//         onProgramChanged();
+//         draggedItem = null;
+//         sourceZone = null;
+//     });
+// }
 
 // TODO раб область
 
-canvas.addEventListener('dragover', function(event) {
-    event.preventDefault();
+// canvas.addEventListener('dragover', function(event) {
+//     event.preventDefault();
 
-    if (sourceZone === 'canvas' && draggedItem) {
-        const afterElement = getDragAfterElement(canvas, event.clientY);
-        if(afterElement == null) {
-            canvas.appendChild(draggedItem);
-        }
-        else {
-            canvas.insertBefore(draggedItem, afterElement);
-        }
-    }
-});
+//     if (sourceZone === 'canvas' && draggedItem) {
+//         // const afterElement = getDragAfterElement(canvas, event.clientY);
+//         // if(afterElement == null) {
+//             canvas.appendChild(draggedItem);
+//         // }
+//         // else {
+//         //     canvas.insertBefore(draggedItem, afterElement);
+//         // }
+//     }
+// });
 
-canvas.addEventListener('drop', function(event) {
-    event.preventDefault();
+// canvas.addEventListener('drop', function(event) {
+//     event.preventDefault();
 
-    if (event.target === canvas) {
-            if (sourceZone === 'palette') {
-                const clone = draggedItem.cloneNode(true);
-                clone.classList.remove('palette-block')
-                makeDraggable(clone);
-                makeDroppable(clone);
+//     if (event.target === canvas) {
+//             if (sourceZone === 'palette') {
+//                 const clone = draggedItem.cloneNode(true);
+//                 clone.classList.remove('palette-block')
+//                 makeDraggable(clone);
+//                 makeDroppable(clone);
 
-                clone.querySelectorAll('.inner-slot').forEach(slot => setupSlot(slot));
-                setupBlockLogic(clone, onProgramChanged);
+//                 clone.querySelectorAll('.inner-slot').forEach(slot => setupSlot(slot));
+//                 setupBlockLogic(clone, onProgramChanged);
 
-                const afterElement = getDragAfterElement(canvas,event.clientY);
-                if (afterElement == null) {
-                    canvas.appendChild(clone);
-                }
-                else {
-                    canvas.insertBefore(clone,afterElement);
-                }
+//                 // const afterElement = getDragAfterElement(canvas,event.clientY);
+//                 // if (afterElement == null) {
+//                     canvas.appendChild(clone);
+//                 // }
+//                 // else {
+//                     // canvas.insertBefore(clone,afterElement);
+//                 // }
 
-            } else if (sourceZone === 'canvas') {
-                setupBlockLogic(draggedItem, onProgramChanged);
-            }
-        }
+//             } else if (sourceZone === 'canvas') {
+//                 setupBlockLogic(draggedItem, onProgramChanged);
+//             }
+//         }
 
-    onProgramChanged();
-    draggedItem = null;
-    sourceZone = null;
-});
+//     onProgramChanged();
+//     draggedItem = null;
+//     sourceZone = null;
+// });
 
 // TODO Логика удаления
 
 palette.addEventListener('dragover', (e) => e.preventDefault());
-palette.addEventListener('drop', function(event){
-    event.preventDefault();
-    if(sourceZone === 'canvas'){
-        draggedItem.remove();
-        onProgramChanged();
-    }
-    draggedItem = null;
-    sourceZone = null;
-});
+
+// palette.addEventListener('drop', function(event){
+//     event.preventDefault();
+//     if(sourceZone === 'canvas'){
+//         draggedItem.remove();
+//         onProgramChanged();
+//     }
+//     draggedItem = null;
+//     sourceZone = null;
+// });
 
 canvas.addEventListener('click', function(event) {
     if (event.target.classList.contains('delete-btn')) {
         const blockToRemove = event.target.closest ('[class^="block"]');
         if (blockToRemove) {
             blockToRemove.remove();
-
-            if (typeof onProgramChanged === 'function') {
-                onProgramChanged();
-            }
         }
     }
 });
 
 // TODO Логика слотов контейнер
 
-function setupSlot(slot) {
-    slot.addEventListener('dragover', function(event) {
-        event.preventDefault();
-        event.stopPropagation();
-        slot.classList.add('drag-over');
-    });
+// function setupSlot(slot) {
+//     slot.addEventListener('dragover', function(event) {
+//         event.preventDefault();
+//         event.stopPropagation();
+//         slot.classList.add('drag-over');
+//     });
 
-    slot.addEventListener('dragleave', function() {
-        slot.classList.remove('drag-over');
-    });
+//     slot.addEventListener('dragleave', function() {
+//         slot.classList.remove('drag-over');
+//     });
 
-    slot.addEventListener('drop', function(event) {
-        event.preventDefault();
-        event.stopPropagation();
-        slot.classList.remove('drag-over');
+//     slot.addEventListener('drop', function(event) {
+//         event.preventDefault();
+//         event.stopPropagation();
+        
+//         slot.classList.remove('drag-over');
 
-        if (!draggedItem) return;
+//         if (!draggedItem) return;
 
-        let element;
-        if (sourceZone === 'palette') {
-            element = draggedItem.cloneNode(true);
-            makeDraggable(element);
-            makeDroppable(element);
-            element.querySelectorAll('.inner-slot').forEach(s => setupSlot(s));
-            setupBlockLogic(element, onProgramChanged); // логика для влож блоков
-        } else {
-            element = draggedItem;
-        }
+//         let element;
+//         if (sourceZone === 'palette') {
+//             element = draggedItem.cloneNode(true);
+//             makeDraggable(element);
+//             makeDroppable(element);
+//             element.querySelectorAll('.inner-slot').forEach(s => setupSlot(s));
+//             setupBlockLogic(element, onProgramChanged); // логика для влож блоков
+//         } else {
+//             element = draggedItem;
+//         }
 
-        element.classList.remove('dropped');
-        element.style.position = 'static';
+//         element.classList.remove('dropped');
+//         element.style.position = 'static';
 
-        slot.appendChild(element);
+//         slot.appendChild(element);
 
-        onProgramChanged();
+//         onProgramChanged();
 
-        draggedItem = null;
-        sourceZone = null;
-    });
-}
+//         draggedItem = null;
+//         sourceZone = null;
+//     });
+// }
 
 // TODO Логика, тут исправил обработчик на каждый блок
 
@@ -272,3 +258,56 @@ if (save_button) {
     });
 }
 
+function onProgramChanged() {
+    const ast = buildUIASTFromCanvas(canvas);
+    if (ast) {
+        updateVarSelectsFromAST(ast);
+    }
+}
+
+function updateVarSelectsFromAST(ast) {
+    if (!ast) return;
+
+    const currentScope = ast.scope;
+
+    for (const entry of ast.nodes) {
+        const node = entry.node;
+        const block = entry.block;
+
+        if (entry.block_type === 'block-assign' || entry.block_type === 'block-print-var' || entry.block_type === 'block-assign-array') {
+            const varNames = currentScope.getNameListOfVisibleVars();
+            const select = block.querySelector('.var-input');
+            if (select) {
+                fillSelectWithNames(select, varNames);
+            }
+        }
+
+        if (entry.block_type === 'block-container') {
+            updateVarSelectsFromAST(node);
+        }
+
+        if (entry.block_type === 'block-while' || entry.block_type === 'block-if') {
+            if (node.body) updateVarSelectsFromAST(node.body);
+            if (node.else_body) updateVarSelectsFromAST(node.else_body);
+        }
+    }
+}
+
+function fillSelectWithNames(select, varNames) {
+    const current = select.value;
+
+    select.innerHTML = '';
+
+    varNames.forEach(name => {
+        const opt = document.createElement('option');
+        opt.value = name;
+        opt.textContent = name;
+        select.appendChild(opt);
+    });
+
+    if (varNames.includes(current)) {
+        select.value = current;
+    } else if (varNames.length > 0) {
+         select.value =varNames[0];
+    }
+}
