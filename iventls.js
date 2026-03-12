@@ -1,4 +1,4 @@
-export function setupBlockLogic(block, trigger_update) {
+export function setupBlockLogic(block, program_change_trigger) {
 
     // const triggerUpdate = () => {
     //     if (typeof window.onProgramChanged === 'function') {
@@ -6,16 +6,12 @@ export function setupBlockLogic(block, trigger_update) {
     //     }
     // };
     
-    if (typeof trigger_update !== 'function') {
-        console.log('wtf');
-    }
-
     if (block.classList.contains('block-var')) {
         const typeInput = block.querySelector('.type-input');
         const nameInput = block.querySelector('.name-input');
 
-        if (typeInput) typeInput.addEventListener('change', trigger_update);
-        if (nameInput) nameInput.addEventListener('input', trigger_update); // тут как я понял если убрать скобки то оно будет вылазить по событыю а не сразу
+        if (typeInput) typeInput.addEventListener('change', program_change_trigger);
+        if (nameInput) nameInput.addEventListener('input', program_change_trigger); // тут как я понял если убрать скобки то оно будет вылазить по событыю а не сразу
     }
 
     if (block.classList.contains('block-var-array')) {
@@ -23,9 +19,9 @@ export function setupBlockLogic(block, trigger_update) {
         const sizeInput = block.querySelector('.size-input');
         const nameInput = block.querySelector('.name-input');
 
-        if (elementTypeInput) elementTypeInput.addEventListener('change', trigger_update); //TODO(добавить возможность делать многомерные массивы)
-        if (sizeInput) sizeInput.addEventListener('input', trigger_update);
-        if (nameInput) nameInput.addEventListener('input', trigger_update); // тут как я понял если убрать скобки то оно будет вылазить по событыю а не сразу
+        if (elementTypeInput) elementTypeInput.addEventListener('change', program_change_trigger); //TODO(добавить возможность делать многомерные массивы)
+        if (sizeInput) sizeInput.addEventListener('input', program_change_trigger);
+        if (nameInput) nameInput.addEventListener('input', program_change_trigger); // тут как я понял если убрать скобки то оно будет вылазить по событыю а не сразу
 
     }
 
@@ -33,28 +29,28 @@ export function setupBlockLogic(block, trigger_update) {
         const varSelect = block.querySelector('.var-input');
         const exprInput = block.querySelector('.expr-input');
 
-        if (varSelect) varSelect.addEventListener('change', trigger_update);
-        if (exprInput) exprInput.addEventListener('input', trigger_update);
+        if (varSelect) varSelect.addEventListener('change', program_change_trigger);
+        if (exprInput) exprInput.addEventListener('input', program_change_trigger);
     }
 
     if (block.classList.contains('block-print-var')) {
         const varSelect = block.querySelector('.var-input');
-        if (varSelect) varSelect.addEventListener('change', trigger_update);
+        if (varSelect) varSelect.addEventListener('change', program_change_trigger);
     }
 
     if (block.classList.contains('block-print-expr')) {
         const exprInput = block.querySelector('.expr-input');
-        if (exprInput) exprInput.addEventListener('input', trigger_update);
+        if (exprInput) exprInput.addEventListener('input', program_change_trigger);
     }
     //TODO добавил блок while
 
     if (block.classList.contains('block-while')) {
         const exprInput = block.querySelector('.expr-input');
-        if (exprInput) exprInput.addEventListener('input', trigger_update);
+        if (exprInput) exprInput.addEventListener('input', program_change_trigger);
     }
 
     if (block.classList.contains('block-if')) {
         const exprInput = block.querySelector('.expr-input');
-        if (exprInput) exprInput.addEventListener('input', trigger_update);
+        if (exprInput) exprInput.addEventListener('input', program_change_trigger);
     }
 }
