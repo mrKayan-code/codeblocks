@@ -106,7 +106,7 @@ function convertBlockToNode(block) {
         case 'block-if':
             return (function() {
                 const condition = block.querySelector('.expr-input').value;
-                const slots = block.querySelector('.inner-slot');
+                const slots = block.querySelectorAll('.inner-slot');
                 return {
                     condition: parseStringExpr(condition),
                     body: slots[0] ? buildAST(slots[0]) : null,

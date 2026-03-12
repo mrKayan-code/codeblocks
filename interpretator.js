@@ -107,6 +107,7 @@ class Interpretator {
                 break;
             case "block-container":
                 this.run(node, scope);
+                break;
 
             case 'block-if':
                 const if_predicate = this.evalExpr(node.condition, scope);
