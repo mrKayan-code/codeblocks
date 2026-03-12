@@ -406,7 +406,7 @@ label {
 
 
 [class^="block"] {
-    animation: fadeSlideIn 0.1s ease forwards;
+    animation: fadeSlideIn 1s ease forwards;
 }
 
 @keyframes fadeSlideIn {
