@@ -77,7 +77,7 @@ function makeDroppable(element) {
 
             element.insertAdjacentElement('afterend', clone);
         } else if (sourceZone === 'canvas') {
-            setupBlockLogic(element, onProgramChange);
+            setupBlockLogic(element, onProgramChanged);
             element.insertAdjacentElement('afterend', draggedItem);
         }
 
@@ -114,7 +114,7 @@ canvas.addEventListener('drop', function(event) {
                 makeDroppable(clone);
 
                 clone.querySelectorAll('.inner-slot').forEach(slot => setupSlot(slot));
-                setupBlockLogic(clone, onProgramChange);
+                setupBlockLogic(clone, onProgramChanged);
 
                 const afterElement = getDragAfterElement(canvas,event.clientY);
                 if (afterElement == null) {
@@ -125,7 +125,7 @@ canvas.addEventListener('drop', function(event) {
                 }
 
             } else if (sourceZone === 'canvas') {
-                setupBlockLogic(draggedItem, onProgramChange);
+                setupBlockLogic(draggedItem, onProgramChanged);
             }
         }
 
@@ -186,7 +186,7 @@ function setupSlot(slot) {
             makeDraggable(element);
             makeDroppable(element);
             element.querySelectorAll('.inner-slot').forEach(s => setupSlot(s));
-            setupBlockLogic(element, onProgramChange); // логика для влож блоков
+            setupBlockLogic(element, onProgramChanged); // логика для влож блоков
         } else {
             element = draggedItem;
         }
@@ -214,7 +214,7 @@ function onProgramChanged() {
         updateVarSelectsFromAST(ast);
     }
 }
-window.onProgramChange = onProgramChanged;
+
 
 function updateVarSelectsFromAST(ast) {
     if (!ast) return;
