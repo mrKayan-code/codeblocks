@@ -4,34 +4,36 @@ import { getDraggedItem, setDraggedItem } from "./drag_and_drop_state.js";
 export function makeBlockDroppable(block, trigger_update) {
     block.addEventListener('drop', (event) => {
         event.preventDefault();
-        event.stopPropagation();
+        // event.stopPropagation();
 
-        const element = getDraggedItem();
+        if (getDraggedItem()) {
+            const element = getDraggedItem();
 
-        block.insertAdjacentElement('afterend', element); //TODO(вместо afterend еще нужно будет добавить beforebegin если бросили на верхнюю часть)
-    
-        trigger_update();
-        setDraggedItem(null);
+            block.insertAdjacentElement('afterend', element); //TODO(вместо afterend еще нужно будет добавить beforebegin если бросили на верхнюю часть)
+        
+            trigger_update();
+            setDraggedItem(null);
+        }
     });
 } //TODO(нужно попробовать обойтись без этой функции)
 
 export function makeSlotDroppable(slot, trigger_update) {
-    slot.classList.remove('drag-over');
-
-    slot.addEventListener('dragover', (event) => {
-        event.preventDefault();
-    });
 
     slot.addEventListener('drop', (event) => {
         event.preventDefault();
-        event.stopPropagation();
+        // event.stopPropagation();
 
-        const element = getDraggedItem();
+        slot.classList.remove('drag-over');
 
-        slot.appendChild(element);
+        if (getDraggedItem()) {
+            const element = getDraggedItem();
+
+            slot.appendChild(element);
+            
+            trigger_update();
+            setDraggedItem(null);
+        }
         
-        trigger_update();
-        setDraggedItem(null);
     });
 }
 
@@ -40,18 +42,19 @@ export function makeCanvasDroppable(canvas, trigger_update) {
         event.preventDefault();
     });
 
-    canvas.addEventListener('drop', (event) => {
-            
+    canvas.addEventListener('drop', (event) => {            
         event.preventDefault();
         // event.stopPropagation();
 
-        const element = getDraggedItem();
+        if (getDraggedItem()) {
+            const element = getDraggedItem();
 
-        console.log(`Сейчас положим: ${element}`);
-        canvas.appendChild(element);
-        
-        trigger_update();
-        setDraggedItem(null);
+            console.log(`Сейчас положим: ${element}`);
+            canvas.appendChild(element);
+            
+            trigger_update();
+            setDraggedItem(null);
+        }
     });
 }
 
