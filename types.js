@@ -137,6 +137,20 @@ export function makeArrayType(element_type, size) {
     };
 }
 
+
+
+export function propagateType(type_a, type_b) {
+    if (type_a === type_b) return type_a;
+    
+    if (type_a === TYPES.ANY || type_b === TYPES.ANY) return TYPES.ANY;
+    
+    if ((type_a === TYPES.INT && type_b === TYPES.FLOAT) || (type_a === TYPES.FLOAT && type_b === TYPES.INT)) {
+        return TYPES.FLOAT;
+    }
+    
+    return TYPES.ANY;
+}
+
 export function stringifyTypedValue(typed_value) {
     
     if(isArrayType(typed_value.type)) {
@@ -159,14 +173,10 @@ export function stringifyTypedValue(typed_value) {
     return typed_value.value;
 }
 
-export function propagateType(type_a, type_b) {
-    if (type_a === type_b) return type_a;
-    
-    if (type_a === TYPES.ANY || type_b === TYPES.ANY) return TYPES.ANY;
-    
-    if ((type_a === TYPES.INT && type_b === TYPES.FLOAT) || (type_a === TYPES.FLOAT && type_b === TYPES.INT)) {
-        return TYPES.FLOAT;
+export function stringifyType(type) {
+    if (isComplexType(type)) {
+        return type.complex_type;
+    } else {
+        return type;
     }
-    
-    return TYPES.ANY;
 }

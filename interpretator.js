@@ -1,6 +1,6 @@
 import { BINARY_OPERATORS_SIGNATURES, UNARY_OPERATORS_SIGNATURES } from "./operators.js";
 import { Scope } from "./scope.js";
-import { typeMatch, TYPES, typedValue, getTypeOf, isArrayType, stringifyTypedValue, isComplexType, COMPLEX_TYPES, makeArrayType } from "./types.js";
+import { typeMatch, TYPES, typedValue, getTypeOf, isArrayType, stringifyTypedValue, isComplexType, COMPLEX_TYPES, makeArrayType, stringifyType } from "./types.js";
 class Interpretator {
     constructor () {
         this.stopped = false;
@@ -77,11 +77,11 @@ class Interpretator {
                 });
                 break;
 
-            case 'block-print-expt':
-                const exprValue = this.evalExpr(node.expr, scope);
+            case 'block-print-expr':
+                const expr_value = this.evalExpr(node.expr, scope);
                 self.postMessage({
                     type: "output",
-                    message: exprValue ? stringifyTypedValue(exprValue) : "null"
+                    message: expr_value ? stringifyTypedValue(expr_value) : "null"
                 });
                 break
 
@@ -184,7 +184,7 @@ class Interpretator {
         const match = signature.signatures.find(sig => typeMatch(sig.arg, argument.type));
 
         if (!match) {
-            throw new Error(`Operator '${op}' not supported for ${argument.type}`);
+            throw new Error(`Operator '${op}' not supported for ${stringifyType(argument.type)}`);
         }
 
         return typedValue(match.result_type, signature.impl(argument.value));
@@ -201,7 +201,7 @@ class Interpretator {
                                                         typeMatch(sig.args[1], right.type)))
         
         if(!match) {
-            throw new Error(`Operator '${op}' not supported for [${left.type}, ${right.type}]`);
+            throw new Error(`Operator '${op}' not supported for [${stringifyType(left.type)}, ${stringifyType(right.type)}]`);
         }
 
         return typedValue(match.result_type, signature.impl(left.value, right.value));
@@ -228,7 +228,7 @@ class Interpretator {
         const size_tv = this.evalExpr(node.size_expr, scope);
 
         if (!typeMatch(TYPES.INT, size_tv.type)) {
-            throw new Error(`Size of array expect int, got: '${size_tv.type}'`);
+            throw new Error(`Size of array expect int, got: '${stringifyType(size_tv.type)}'`);
         }
 
         if (size_tv.value < 1) {

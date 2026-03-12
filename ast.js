@@ -83,10 +83,10 @@ function convertBlockToNode(block) {
             })();
 
         case 'block-print-expr':
-        return (function() {
-            const expr = block.querySelector('.espr-input').value;
-            return {expr: parseStringExpr(espr)};
-        })();
+            return (function() {
+                const expr = block.querySelector('.expr-input').value;
+                return {expr: parseStringExpr(expr)};
+            })();
         
         case 'block-container':
             return (function() {
