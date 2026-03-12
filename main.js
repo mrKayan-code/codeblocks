@@ -13,12 +13,7 @@ const interpretator = new InterpretatorManager((msg) => {
             const line = document.createElement("div");
             line.textContent = `${msg}`;
             consoleOutput.appendChild(line);
-        })
-
-// let draggedItem = null;
-// let sourceZone = null;  //фигни чтобы помнить что и откуда перетаскичаю
-
-// TODO Функция после сего надо вообще бросить блок
+        });
 
 // function getDragAfterElement (container, y) {
 //     const draggableElement = [...container.querySelectorAll('[class^="block"]:not(.dragging), .block:not(.dragging)')];
@@ -52,55 +47,6 @@ canvas.addEventListener('click', function(event) {
         }
     }
 });
-
-// TODO Логика слотов контейнер
-
-// function setupSlot(slot) {
-//     slot.addEventListener('dragover', function(event) {
-//         event.preventDefault();
-//         event.stopPropagation();
-//         slot.classList.add('drag-over');
-//     });
-
-//     slot.addEventListener('dragleave', function() {
-//         slot.classList.remove('drag-over');
-//     });
-
-//     slot.addEventListener('drop', function(event) {
-//         event.preventDefault();
-//         event.stopPropagation();
-        
-//         slot.classList.remove('drag-over');
-
-//         if (!draggedItem) return;
-
-//         let element;
-//         if (sourceZone === 'palette') {
-//             element = draggedItem.cloneNode(true);
-//             makeDraggable(element);
-//             makeDroppable(element);
-//             element.querySelectorAll('.inner-slot').forEach(s => setupSlot(s));
-//             setupBlockLogic(element, onProgramChanged); // логика для влож блоков
-//         } else {
-//             element = draggedItem;
-//         }
-
-//         element.classList.remove('dropped');
-//         element.style.position = 'static';
-
-//         slot.appendChild(element);
-
-//         onProgramChanged();
-
-//         draggedItem = null;
-//         sourceZone = null;
-//     });
-// }
-
-// TODO Логика, тут исправил обработчик на каждый блок
-
-
-//TODO обновил программы и аст
 
 
 //TODO кнопка старт

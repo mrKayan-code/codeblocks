@@ -1,12 +1,9 @@
-import { makeBlockDroppable, makeSlotDroppable } from "./drop_manager.js";
+import { makeSlotDroppable } from "./drop_manager.js";
 
 export function activateBlock(block, trigger_update) {
     setupBlockLogic(block, trigger_update);
     
     block.querySelectorAll('.inner-slot').forEach(slot => setupSlot(slot, trigger_update));
-
-    makeBlockDroppable(block, trigger_update);
-
 }
 
 function setupSlot(slot, trigger_update) {
@@ -31,7 +28,7 @@ function setupBlockLogic(block, trigger_update) {
         const nameInput = block.querySelector('.name-input');
 
         if (typeInput) typeInput.addEventListener('change', trigger_update);
-        if (nameInput) nameInput.addEventListener('input', trigger_update); // тут как я понял если убрать скобки то оно будет вылазить по событыю а не сразу
+        if (nameInput) nameInput.addEventListener('input', trigger_update);
     }
 
     if (block.classList.contains('block-var-array')) {
@@ -41,8 +38,7 @@ function setupBlockLogic(block, trigger_update) {
 
         if (elementTypeInput) elementTypeInput.addEventListener('change', trigger_update); //TODO(добавить возможность делать многомерные массивы)
         if (sizeInput) sizeInput.addEventListener('input', trigger_update);
-        if (nameInput) nameInput.addEventListener('input', trigger_update); // тут как я понял если убрать скобки то оно будет вылазить по событыю а не сразу
-
+        if (nameInput) nameInput.addEventListener('input', trigger_update); 
     }
 
     if (block.classList.contains('block-assign')) {
