@@ -481,35 +481,3 @@ label {
     background-color: rgba(250, 115, 115, 0.4);
     color:#f6f4f4
 }
-
-.block.dragging {
-    opacity: 0.4;
-    pointer-events: none;
-}
-
-#drag-ghost {
-    position: fixed;
-    z-index: 10000;
-    pointer-events: none;
-    transform: translate(-50%, -50%);
-    filter: drop-shadow(4px 4px 8px rgba(0, 0, 0, 0.3));
-    opacity: 0.95;
-    transition: opacity 0.1s;
-}
-
-.drop-target {
-    outline: 2px dashed #4CAF51;
-    outline-offset: 4px;
-    background: rgba(76, 175, 80, 0.1);
-    transition: all 0.1s;
-}
-
-.drop-indicator {
-    position: absolute;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: #2196F2;
-    pointer-events: none;
-    z-index: 9999;
-}
