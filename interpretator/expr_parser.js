@@ -223,7 +223,7 @@ class ExpressionParser {
                     }
 
                     this.expect('op', ']')
-                    return this.parsePostfix({type: 'ArrayLiteral', elements: elements}); //TODO(нужно сделать нормальный эррэй литерал)
+                    return this.parsePostfix({type: 'ArrayLiteral', elements: elements});
                 }
                 throw new Error(`Unexpected op: '${token.value}' in factor`);
             case 'boolean':
@@ -234,7 +234,7 @@ class ExpressionParser {
         }
     }
 
-    parsePostfix(ident) { //TODO(сюда функции)
+    parsePostfix(ident) { //TODO(сюда функции) 
         let node = ident;
 
         while(this.peek() && this.peek().value === '[') {
@@ -244,10 +244,14 @@ class ExpressionParser {
             node = {type: 'IndexNotation', obj: node, index: index};
         }
 
+        while(this.peek() && this.peek().value === '(') {
+            //TODO(funcCall)
+        }
+
         return node;
     }
 
-}   
+}
 
 
 

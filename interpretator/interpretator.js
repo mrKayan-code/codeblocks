@@ -33,64 +33,58 @@ class Interpretator {
 
     execute(node, block_type, scope) {
         switch (block_type) {
-            case 'block-var':
-                scope.addVar(node.name, node.type, this.getDefaultValueForType(node.type));
+            case 'block-var': (() => {
+                const initial_value = node.init_expr ? this.evalExpr(node.init_expr, scope).value : this.getDefaultValueForType(node.type);
                 
-                break;
-            case 'block-var-array': 
-                const tv = this.initArray(node, scope, this.getDefaultValueForType(node.element_type));
+                scope.addVar(node.name, node.type, initial_value);
+            })();            
+            break;
 
-                scope.addVar(node.name, tv.type, tv.value)
+            case 'block-var-array': (() => {})();
+                const tv = this.initArray(node, scope, this.getDefaultValueForType(node.element_type));
+                const initial_value = node.init_expr ? this.evalExpr(node.init_expr, scope).value : tv.value;
+
+                scope.addVar(node.name, tv.type, initial_value);
                 break;
                 
-            case 'block-assign':
+            case 'block-assign':(() => {
                 const typed_value = this.evalExpr(node.expr, scope);
                 scope.setVar(node.name, typed_value.value, typed_value.type);
-                break;
-            case 'block-assign-array':
-                // self.postMessage({
-                //     type: "output",
-                    
-                //     message: JSON.stringify(node)
-                // });
+            })();
+            break;
+            case 'block-assign-array':(() => {
                 const array_elem = this.evalExpr(node.index_notation, scope);               
                 const expr = this.evalExpr(node.expr, scope);
                 
 
                 if (!typeMatch(array_elem.type, expr.type)) {
-                    throw new Error(`array expect ${array_elem.type}, got: ${expr.type}`);
+                    throw new Error(`Array expect ${array_elem.type}, got: ${expr.type}`);
                 }
 
                 array_elem.value = expr.value;
-                break;
-            case 'block-print-var':
+            })();
+            break;
+            case 'block-print-var': (() => {
                 const varData = scope.getVar(node.name);
-                // self.postMessage({
-                //     type: "output",
-                    
-                //     message: JSON.stringify(varData)
-                // });
+                
                 self.postMessage({
                     type: "output",
                     
-                    message: varData ? stringifyTypedValue(varData) : "null" //TODO(лютый костыль)
+                    message: varData ? stringifyTypedValue(varData) : "null" 
                 });
-                break;
+            })();
+            break;
 
-            case 'block-print-expr':
+            case 'block-print-expr':(() => {
                 const expr_value = this.evalExpr(node.expr, scope);
                 self.postMessage({
                     type: "output",
                     message: expr_value ? stringifyTypedValue(expr_value) : "null"
                 });
-                break
+            })();
+            break
 
-            case 'block-while':
-                const typed_predicate = this.evalExpr(node.condition, scope);
-                if (!typeMatch(TYPES.BOOLEAN, typed_predicate.type)) {
-                    throw new Error(`Expected boolean, got ${typed_predicate.type}`);
-                }
-
+            case 'block-while':(() => {
                 while (true) {
                     const typed_predicate = this.evalExpr(node.condition, scope);
                     
@@ -104,25 +98,61 @@ class Interpretator {
 
                     this.run(node.body, scope);
                 }
-                break;
-            case "block-container":
+            })();
+            break;
+                
+            case "block-container":(() => {
                 this.run(node, scope);
-                break;
-
-            case 'block-if':
-                const if_predicate = this.evalExpr(node.condition, scope);
+                
+            })();
+            break;
+            
+            case 'block-if':(() => {
+                const typed_predicate = this.evalExpr(node.condition, scope);
 
                 if (!typeMatch(TYPES.BOOLEAN, if_predicate.type)) {
-                    throw new Error(`If condition expected boolean, got ${if_predicate.type}`);
+                    throw new Error(`Expected boolean, got ${if_predicate.type}`);
                 }
 
-                if (if_predicate.value) {
+                if (typed_predicate.value) {
                     this.run(node.body, scope);
                 } else if (node.else_body) {
                     this.run(node.else_body, scope);
                 }
+            })();
+            break;
 
-                break;
+            case 'block-for':(() => {
+                const for_scope = new Scope(scope);
+
+                const initial_value = node.step_var_init_expr ? this.evalExpr(node.step_var_init_expr, for_scope).value : this.getDefaultValueForType(node.step_var_type);
+                
+                for_scope.addVar(node.step_var_name, node.step_var_type, initial_value);
+
+                while (true) {
+                    const typed_predicate = this.evalExpr(node.condition_expr, for_scope);
+                    
+                    if (!typeMatch(TYPES.BOOLEAN, typed_predicate.type)) {
+                        throw new Error(`Expected boolean, got ${typed_predicate.type}`);
+                    }
+
+                    if (!typed_predicate.value) {
+                        break;
+                    }
+
+                    this.run(node.body, for_scope);
+
+                    if (node.step_expr) {
+                        const typed_value = this.evalExpr(node.step_expr, for_scope);
+
+                        for_scope.setVar(node.step_var_name, typed_value.value, typed_value.type);
+                    }
+
+                }
+            })();
+            break;
+
+                
         }
     }
 
@@ -265,5 +295,3 @@ function makeArray(size, tv) {
     }
     return arr;
 }
-
-

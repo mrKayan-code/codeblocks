@@ -1,4 +1,4 @@
-import { typeMatch, getTypeOf, typedValue } from "./types.js";
+import { typeMatch, getTypeOf, typedValue, stringifyType } from "./types.js";
 
 export class Scope {
     parent;
@@ -32,7 +32,7 @@ export class Scope {
         // }
 
         if (!isTypeCompatible(type, initial_value)) {
-            throw new Error(`type error: var '${name}' expect ${type}, got ${getTypeOf(initial_value)}`);
+            throw new Error(`type error: var '${name}' expect ${stringifyType(type)}, got ${stringifyType(getTypeOf(initial_value))}`);
         }
 
         
@@ -50,7 +50,7 @@ export class Scope {
         }
 
         if (!isTypeCompatible(vari.type, value) ) {
-            throw new Error(`type error: var '${name}' expect ${vari.type}, got ${getTypeOf(value)}`);
+            throw new Error(`type error: var '${name}' expect ${stringifyType(vari.type)}, got ${stringifyType(getTypeOf(value))}`);
         }
 
         vari.value = value;
@@ -65,7 +65,7 @@ export class Scope {
         }
 
         if (!typeMatch(vari.type, type) ) {
-            throw new Error(`type error: var '${name}' expect ${vari.type}, got ${type}}`);
+            throw new Error(`type error: var '${name}' expect ${stringifyType(vari.type)}, got ${stringifyType(type)}}`);
         }
 
         vari.value = value;

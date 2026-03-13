@@ -184,11 +184,14 @@ select option{
     color: #e4e4e7;
 }
 
-label {
+span {
     font-size: 0.75rem;
     color: #a1a1aa;
     margin-right: 4px;
 }
+
+
+
 
 /*блокс присваивания*/
 

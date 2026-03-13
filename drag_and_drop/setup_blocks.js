@@ -70,4 +70,21 @@ function setupBlockLogic(block, trigger_update) {
         if (exprInput) exprInput.addEventListener('input', trigger_update);
     }
 
+    if (block.classList.contains('block-for')) {
+        const typeInput = block.querySelector('.type-input');
+        const nameInput = block.querySelector('.name-input');
+        const initExprInput = block.querySelector('.init-expr-input');
+        const conditionInput = block.querySelector('.condition-input');
+        const varInput = block.querySelector('.counter-var-input');
+        const stepExprInput = block.querySelector('.step-expr-input');
+
+        if (typeInput) typeInput.addEventListener('change', trigger_update);
+        if (nameInput) nameInput.addEventListener('input', trigger_update);
+        if (initExprInput) initExprInput.addEventListener('input', trigger_update);
+        if (conditionInput) conditionInput.addEventListener('input', trigger_update);
+        if (varInput) varInput.addEventListener('change', trigger_update);
+        if (stepExprInput) stepExprInput.addEventListener('input', trigger_update);
+        
+    }
+
 }

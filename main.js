@@ -129,6 +129,20 @@ function updateVarSelectsFromAST(ast) {
             if (node.body) updateVarSelectsFromAST(node.body);
             if (node.else_body) updateVarSelectsFromAST(node.else_body);
         }
+
+        if (entry.block_type === 'block-for') {
+            const counterVarName = block.querySelector('.name-input').value.trim();
+
+            const select = block.querySelector('.counter-var-input');
+            
+            select.innerHTML = '';    
+            const opt = document.createElement('option');
+            opt.value = counterVarName;
+            opt.textContent = counterVarName;
+            select.appendChild(opt);
+
+            updateVarSelectsFromAST(node.body);
+        }
     }
 }
 

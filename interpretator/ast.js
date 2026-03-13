@@ -36,17 +36,24 @@ function convertBlockToNode(block) {
                 const type = block.querySelector('.type-input').value;
                 const name = block.querySelector('.name-input').value.trim();
                 
+                const init_expr_input = block.querySelector('.init-expr-input')?.value || '';
+                const init_expr = init_expr_input ? parseStringExpr(init_expr_input) : null;
+
+
                 if (name == '') {
                     throw new Error('Var has no name')
                 }
                 
-                return {type: type, name: name};
+                return {type: type, name: name,init_expr: init_expr};
             })();
         case 'block-var-array': // TODO(пока так, мб как то нэстингом засунуть массивы в block var, там же и с вложенными массивами и типами раскидаться)
             return (function() {
                 const name = block.querySelector('.name-input').value.trim();
                 const element_type = block.querySelector('.element-type-input').value; //TODO(точно также если добавим многомерные массивы здесь в типе еще раз вызвать convertbtn)
                 const size_expr = block.querySelector('.size-input').value;
+
+                const init_expr_input = block.querySelector('.init-expr-input')?.value || '';
+                const init_expr = init_expr_input ? parseStringExpr(init_expr_input) : null;
 
                 if (name == '') {
                     throw new Error('Var has no name')
@@ -55,7 +62,8 @@ function convertBlockToNode(block) {
                 return {
                     name: name,
                     element_type: element_type,
-                    size_expr: parseStringExpr(size_expr)
+                    size_expr: parseStringExpr(size_expr),
+                    init_expr: init_expr
                 };
             })();
         case 'block-assign':
@@ -111,6 +119,34 @@ function convertBlockToNode(block) {
                     condition: parseStringExpr(condition),
                     body: slots[0] ? buildAST(slots[0]) : null,
                     else_body:slots[1] ? buildAST(slots[1]) : null
+                };
+            })();
+        case 'block-for':
+            return (function() {
+                
+                const var_name = block.querySelector('.name-input').value.trim();
+                
+                const type = block.querySelector('.type-input').value;
+                
+                const init_expr_input = block.querySelector('.init-expr-input')?.value || '';
+                const init_expr = init_expr_input ? parseStringExpr(init_expr_input) : null;
+                
+                const condition_expr = parseStringExpr(block.querySelector('.condition-input').value); //TODO(в cподобных пустота на true заменяется)
+                // const step_var_name = block.querySelector('.counter-var-input').value;
+                
+                const step_expr =  parseStringExpr(block.querySelector('.step-expr-input').value);
+                
+                const innerSlot = block.querySelector('.inner-slot');
+
+                const body = buildAST(innerSlot);
+
+                return {
+                    step_var_type: type,
+                    step_var_name: var_name,
+                    step_var_init_expr: init_expr,
+                    condition_expr: condition_expr,
+                    step_expr: step_expr,
+                    body: body 
                 };
             })();
 

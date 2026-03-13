@@ -27,32 +27,29 @@
                 <div id = "palette">
         <h2>Палитра</h2>
 
-        <div class="block-var" draggable = "true">
-            <span class="delete-btn">&times;</span> var
+        <div class="block-var" draggable = "true"> var
+            <span class="delete-btn">&times;</span> 
             <br>
-            <label>type</label>
+            <span>type</span>
             <select class="type-input" name="type">
                 <option value="int">int</option>
                 <option value="float">float</option>
                 <option value="string">string</option>
                 <option value="boolean">boolean</option>
-
-                <!-- <option value="array<int>">array&lt;int&gt;</option>
-                <option value="array<float>">array&lt;float&gt;</option>
-                <option value="array<string>">array&lt;string&gt;</option>
-                <option value="array<boolean>">array&lt;boolean&gt;</option>
-                <option value="array<any>">array&lt;any&gt;</option> -->
             </select>
 
-            <label>name</label>
+            <span>name</span>
             <input class="name-input" type="text">
+            
+            <span>=</span>
+            <input class="init-expr-input" type="text">
         </div>
 
-        <div class="block-var-array" draggable="true">
+        <div class="block-var-array" draggable="true"> var
             <span class="delete-btn">&times;</span>
             
-            <label>array</label>
-            <label>&lt;</label>
+            <span>array</span>
+            <span>&lt;</span>
             
             <select class="element-type-input">
                 <option value="int">int</option>
@@ -62,40 +59,47 @@
                 <!-- <option value="array">array&lt;...&gt;</option> -->
             </select>
 
-            <label>, </label>
+            <span>, </span>
             
             <input class="size-input" type="text">
             
-            <label>&gt;</label>
+            <span>&gt;</span>
             
-            <label>name</label>
+            <span>name</span>
             <input class="name-input" type="text">
+
+            <span>=</span>
+
+            <input class="init-expr-input" type="text">
         </div>
 
-        <div class="block-assign" draggable = "true">
-            <span class="delete-btn">&times;</span> assign
-            <label>var</label><select class="var-input">
-                <option value="test">test</option>
-            </select>
-                                    <label> = </label>
-            <input class="expr-input" type = "text">
-        </div>
-
-        <div class="block-assign-array" draggable="true">
-            <span class="delete-btn">&times;</span>
-            <label>array</label>
+        <div class="block-assign" draggable = "true"> assign
+            <span class="delete-btn">&times;</span> 
+            <span>var</span>
             <select class="var-input">
                 <option value="test">test</option>
             </select>
-            <label><==</label>
+            <span> = </span>
+            <input class="expr-input" type = "text">
+        </div>
+
+        <div class="block-assign-array" draggable="true"> assign
+            <span class="delete-btn">&times;</span>
+            <span>array</span>
+            <select class="var-input">
+                <option value="test">test</option>
+            </select>
+            <span><==</span>
             <input class="index-input" type="text">
-            <label> = </label>
+            <span> = </span>
             <input class="expr-input" type="text">
         </div>
 
-        <div class="block-print-var" draggable="true">
-            <span class="delete-btn">&times;</span> print
-            <label for="var-input">var</label><select class="var-input" name = "var-input">
+        <div class="block-print-var" draggable="true"> print
+            <span class="delete-btn">&times;</span>
+            
+            <span>var</span>
+            <select class="var-input" name = "var-input">
                 <option value="test">test</option>
             </select>
         </div>
@@ -106,37 +110,59 @@
 
             <div class="inner-slot">do</div>
         </div>
+        
         <div class="block-container" draggable = "true">
             <span class="delete-btn">&times;</span>
             <div class="block-header">Container:</div>
             <div class="inner-slot"></div>
         </div>
 
-        <div class="block-print-expr" draggable="true">
-            <span class="delete-btn">&times;</span>print expr
+        <div class="block-print-expr" draggable="true"> print
+            <span class="delete-btn">&times;</span>
             <input class="expr-input" type="text">
         </div>
 
         <div class="block-if" draggable="true">
             <span class="delete-btn">&times;</span>
-            <div class="block-header">if: </div><input class="expr-input" type="text">
+            <div class="block-header">if: </div>
+            <input class="expr-input" type="text">
             <div class="inner-slot">then</div>
             
             <div class="inner-slot">else</div>
         </div>
 
-        <div class="block-for" draggable="true">
+        <div class="block-for" draggable="true"> 
             <span class="delete-btn">&times;</span>
-            
+            <div class="block-header">for: </div>
             <header>
-                <span>for</span>
                 <span>(</span>
                 
+                <select class="type-input" name="type">
+                    <option value="int">int</option>
+                    <option value="float">float</option>
+                    <option value="string">string</option>
+                    <option value="boolean">boolean</option>
+                </select>
                 
-                <span>;</span>
+                <input class="name-input" type="text">
+
+                <span>=</span>
+
+                <input class="init-expr-input" type="text">
                 
+                <label>;</label>
+
+                <span>till</span>
+
+                <input class="condition-input" type="text">
                 
-                <span>;</span>
+                <label>;</label>
+                
+                <select class="counter-var-input">
+                    <option value="test">test</option>
+                </select>
+                <span> = </span>
+                <input class="step-expr-input" type="text">
                 
                 
                 <span>)</span>

@@ -175,6 +175,15 @@ export function stringifyTypedValue(typed_value) {
 
 export function stringifyType(type) {
     if (isComplexType(type)) {
+        if (isArrayType(type)) {
+            let str = '';
+            str += type.complex_type;
+
+            str += '<' + stringifyType(type.element_type) + ', ' + type.size + '>';
+
+            return str;
+        }
+        
         return type.complex_type;
     } else {
         return type;
