@@ -1,6 +1,6 @@
 import { buildUIASTFromCanvas } from "./uiast.js";
-import { buildASTFromCanvas } from "./ast.js";
-import InterpretatorManager from "./worker_manager.js";
+import { buildASTFromCanvas } from "./interpretator/ast.js";
+import InterpretatorManager from "./interpretator/worker_manager.js";
 import { makeDraggablePaletteBlock } from "./drag_and_drop/dragstart_manager.js";
 import { makeCanvasDroppable, makePaletteDroppable} from "./drag_and_drop/drop_manager.js";
 import { setupBlockUI } from "./console_ui.js"; setupBlockUI();
@@ -15,26 +15,7 @@ const interpretator = new InterpretatorManager((msg) => {
             const line = document.createElement("div");
             line.textContent = `${msg}`;
             consoleOutput.appendChild(line);
-        })
-
-// let draggedItem = null;
-// let sourceZone = null;  //фигни чтобы помнить что и откуда перетаскичаю
-
-// TODO Функция после сего надо вообще бросить блок
-
-// function getDragAfterElement (container, y) {
-//     const draggableElement = [...container.querySelectorAll('[class^="block"]:not(.dragging), .block:not(.dragging)')];
-//     return draggableElement.reduce((closest, child) => {
-//         const box = child.getBoundingClientRect();
-//         const offset = y - box.top - box.height / 2;
-
-//         if (offset < 0 && offset > closest.offset) {
-//             return {offset: offset, element: child};
-//         } else {
-//             return closest;
-//         }
-//     }, {offset: Number.NEGATIVE_INFINITY}).element;
-// }
+        });
 
 
 const originalBlocks = document.querySelectorAll('#palette [class^="block"]');
@@ -54,55 +35,6 @@ canvas.addEventListener('click', function(event) {
         }
     }
 });
-
-// TODO Логика слотов контейнер
-
-// function setupSlot(slot) {
-//     slot.addEventListener('dragover', function(event) {
-//         event.preventDefault();
-//         event.stopPropagation();
-//         slot.classList.add('drag-over');
-//     });
-
-//     slot.addEventListener('dragleave', function() {
-//         slot.classList.remove('drag-over');
-//     });
-
-//     slot.addEventListener('drop', function(event) {
-//         event.preventDefault();
-//         event.stopPropagation();
-        
-//         slot.classList.remove('drag-over');
-
-//         if (!draggedItem) return;
-
-//         let element;
-//         if (sourceZone === 'palette') {
-//             element = draggedItem.cloneNode(true);
-//             makeDraggable(element);
-//             makeDroppable(element);
-//             element.querySelectorAll('.inner-slot').forEach(s => setupSlot(s));
-//             setupBlockLogic(element, onProgramChanged); // логика для влож блоков
-//         } else {
-//             element = draggedItem;
-//         }
-
-//         element.classList.remove('dropped');
-//         element.style.position = 'static';
-
-//         slot.appendChild(element);
-
-//         onProgramChanged();
-
-//         draggedItem = null;
-//         sourceZone = null;
-//     });
-// }
-
-// TODO Логика, тут исправил обработчик на каждый блок
-
-
-//TODO обновил программы и аст
 
 
 //TODO кнопка старт

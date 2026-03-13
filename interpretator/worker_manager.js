@@ -11,7 +11,7 @@ class WorkerManager {
         }
 
         this.is_running = true;
-        this.worker = new Worker("./interpretator.js", { type: 'module' });
+        this.worker = new Worker("./interpretator/interpretator.js", { type: 'module' });
 
         this.worker.onmessage = (e) => {
             const {type, message} = e.data;
@@ -32,15 +32,15 @@ class WorkerManager {
         };
 
         this.worker.onerror = (e) => {
-            console.error('Worker Error', {
-                message: e.message,
-                filename: e.filename,
-                lineno: e.lineno,
-                colno: e.colno,
-                error: e.error
-            });
+            // console.error('Worker Error', {
+            //     message: e.message,
+            //     filename: e.filename,
+            //     lineno: e.lineno,
+            //     colno: e.colno,
+            //     error: e.error
+            // });
             
-            this.output(`Worker error: ${e.message}`);
+            this.output(`Worker error: ${e.error}`);
             
             this.stop();
             
