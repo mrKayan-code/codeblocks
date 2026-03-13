@@ -1,6 +1,6 @@
 import { BINARY_OPERATORS_SIGNATURES, UNARY_OPERATORS_SIGNATURES } from "./operators.js";
 import { Scope } from "./scope.js";
-import { typeMatch, TYPES, typedValue, getTypeOf, isArrayType, stringifyTypedValue, isComplexType, COMPLEX_TYPES, makeArrayType, stringifyType } from "./types.js";
+import { typeMatch, TYPES, typedValue, getTypeOf, isArrayType, stringifyTypedValue, isComplexType, COMPLEX_TYPES, makeArrayType, stringifyType } from "../types.js";
 class Interpretator {
     constructor () {
         this.stopped = false;

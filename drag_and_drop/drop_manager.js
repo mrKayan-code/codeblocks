@@ -4,23 +4,12 @@ export function makeSlotDroppable(slot, trigger_update) {
 
     slot.addEventListener('drop', (event) => {
         event.preventDefault();
-        // event.stopPropagation();
+        event.stopPropagation();
 
         slot.classList.remove('drag-over');
 
         if (getDraggedItem()) {
-            const element = getDraggedItem();
-            const { anchor_element, position } = getDropPosition(slot, event.clientY);
-
-            if (anchor_element) {
-                if (position === 'before') {
-                    slot.insertBefore(element, anchor_element);
-                } else {
-                    anchor_element.insertAdjacentElement('afterend', element);
-                }
-            } else {
-                slot.appendChild(element);
-            }
+            drop(event, slot, getDraggedItem());
             
             trigger_update();
             setDraggedItem(null);
@@ -36,22 +25,9 @@ export function makeCanvasDroppable(canvas, trigger_update) {
 
     canvas.addEventListener('drop', (event) => {            
         event.preventDefault();
-        // event.stopPropagation();
 
         if (getDraggedItem()) {
-            const element = getDraggedItem();
-            const { anchor_element, position } = getDropPosition(canvas, event.clientY);
-
-            if (anchor_element) {
-                if (position === 'before') {
-                    // anchor_element.insertAdjacentElement('beforebegin', element);
-                    canvas.insertBefore(element, anchor_element);
-                } else {
-                    anchor_element.insertAdjacentElement('afterend', element);
-                }
-            } else {
-                canvas.appendChild(element);
-            }
+            drop(event, canvas, getDraggedItem());
             
             trigger_update();
             setDraggedItem(null);
@@ -75,6 +51,21 @@ export function makePaletteDroppable(palette) {
     });
 
 }
+
+function drop(event, container, element) {
+    const { anchor_element, position } = getDropPosition(container, event.clientY);
+
+    if (anchor_element) {
+        if (position === 'before') {
+            container.insertBefore(element, anchor_element);
+        } else {
+            anchor_element.insertAdjacentElement('afterend', element);
+        }
+    } else {
+        container.appendChild(element);
+    }
+}
+
 
 function getDropPosition(container, mouseY) {
     // const blocks = [...container.querySelectorAll('[class^="block"]')];

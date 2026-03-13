@@ -1,7 +1,7 @@
-import { parseStringExpr } from "./expr_parser.js";
-import { Scope } from "./scope.js";
-import { CONTINUE_TOKEN } from "./tokenizer.js";
-import { makeArrayType } from "./types.js";
+import { parseStringExpr } from "./interpretator/expr_parser.js";
+import { Scope } from "./interpretator/scope.js";
+import { CONTINUE_TOKEN } from "./interpretator/tokenizer.js";
+import { makeArrayType } from "./interpretator/types.js";
 
 export function buildUIASTFromCanvas(canvas) {    
     return buildUIAST(canvas, null);;

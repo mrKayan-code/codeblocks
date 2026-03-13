@@ -1,5 +1,5 @@
 import { buildUIASTFromCanvas } from "./uiast.js";
-import { buildASTFromCanvas } from "./ast.js";
+import { buildASTFromCanvas } from "./interpretator/ast.js";
 import InterpretatorManager from "./worker_manager.js";
 import { makeDraggablePaletteBlock } from "./drag_and_drop/dragstart_manager.js";
 import { makeCanvasDroppable, makePaletteDroppable} from "./drag_and_drop/drop_manager.js";
