@@ -3,6 +3,8 @@ import { buildASTFromCanvas } from "./interpretator/ast.js";
 import InterpretatorManager from "./interpretator/worker_manager.js";
 import { makeDraggablePaletteBlock } from "./drag_and_drop/dragstart_manager.js";
 import { makeCanvasDroppable, makePaletteDroppable} from "./drag_and_drop/drop_manager.js";
+import { setupBlockUI } from "./console_ui.js"; setupBlockUI();
+
 
 const canvas = document.getElementById('canvas');
 const palette = document.getElementById('palette');
