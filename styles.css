@@ -10,7 +10,7 @@ body {
     color: #ffffff;
     margin: 0;
     padding: 0;
-    font-family: 'Segoe UI', sistem-ui, sans-serif;
+    font-family: 'Consolas', sistem-ui, sans-serif;
     height: 100vh;
     list-style: 1.5;
     display: flex;
@@ -131,7 +131,7 @@ body {
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-[class^="block"], .block {
+[class^="block"]{
     background-color: #27272a;
     color: #e4e4e6;
     width: 100%;
@@ -144,6 +144,7 @@ body {
     font-weight: 500;
     transition:transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
     user-select: none;
+    position: relative;
 }
 
 [class^="block"]:hover, .block:hover {
@@ -165,7 +166,7 @@ input, select {
     border: 1px solid rgba(255,255,255,0.1);
     border-radius: 6px;
     padding: 4px 8px;
-    font-size: 0.8rem;
+    font-size: 1rem;
     font-family: inherit;
     margin-top: 4px;
     outline: none;
@@ -183,11 +184,14 @@ select option{
     color: #e4e4e7;
 }
 
-label {
+span {
     font-size: 0.75rem;
     color: #a1a1aa;
     margin-right: 4px;
 }
+
+
+
 
 /*блокс присваивания*/
 
@@ -299,7 +303,7 @@ label {
     min-height: 50px;
     border-radius: 8px;
     padding: 8px;
-    display: block !important;
+    display: block /*!important*/;
     transition: background-color 0.25s ease, border-color 0.25s ease;
 }
 
@@ -308,12 +312,12 @@ label {
     border-color: #f0db4f;
 }
 
-.dropped {
+/* .dropped {
     position: absolute;
     background: #2d6a4f;
     padding: 10px 14px;
     border-color: #40917c;
-}
+} */
 
 /*консоль*/
 
@@ -326,13 +330,13 @@ label {
     flex-direction: column;
 }
 
-/* .console-header {
+.console-header {
     display: flex;
     align-items: center;
-    justify-content: space-between; надо на будущее
+     justify-content: space-between; /* надо на будущее */
     padding: 12px 16px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-} */
+}
 
 .console-header h2 {
     font-size: 0.80rem;
@@ -362,7 +366,7 @@ label {
 
 #console-output {
     flex: 1;
-    padding: 12px16px;
+    padding: 12px 16px;
     overflow-y: auto;
     font-family: 'SF Mono', 'Consolas', monospace;
     /*SF Mono   Cascadia Code   Fira Code   Consolas*/
@@ -400,9 +404,81 @@ label {
     color: #64ff58;
 }
 
+/*скрытие консоли*/
+
+#workspace {
+    position: relative;
+}
+
+#console {
+    transition: margin-right 0.3s ease;
+    position: relative;
+    z-index: 10;
+    width: 280px;
+}
+
+#console.collapsed {
+    margin-right: -280px;
+}
+
+.console-header {
+    position: relative;
+}
+
+.toggle-btn {
+    position: absolute;
+    right: 75px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 30px;
+    height: 22px;
+    border-radius: 25%;
+    background-color: transparent;
+    border: 1px solid rgba(250,250,250, 0.08);
+    color: #71717a;
+    cursor: pointer;
+    display:  flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    z-index: 20;
+    box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.2);
+    transition: right 0.3s ease, transform 0.3s ease,background-color 0.2s, color 0.2s;
+}
+
+.toggle-btn:hover {
+    color: #f4f1f1;
+    background-color:rgba(250, 115, 115, 0.15);
+    transform:translateY(-50%) scale(1.1);
+}
+
+#console.collapsed .toggle-btn {
+    right: 280px;
+    background-color: #18181d;
+    border: 1px solid rgba(255,255,255,0.15);
+    transform:translateY(-50%) rotate(180deg);
+    box-shadow: -3px 0 8px rgba(0, 0, 0, 0.4);
+}
+
+#console.collapsed .toggle-btn:hover {
+    transform:translateY(-50%) rotate(180deg) scale(1.1);
+}
+
+@media (max-width: 600px) {
+    #pallete {
+        width: 120px;
+        min-width: 120px;
+    }
+    #console {
+        position: fixed;
+        right: 0;
+        height: calc(100vh - 56px);
+        box-shadow: -5px 0 15px rgba(0, 0, 0, 0.5);
+    }
+}
+
+
 /*АНИМАЦИИИИИИ*/
-
-
 
 [class^="block"] {
     animation: fadeSlideIn 1s ease forwards;
@@ -444,3 +520,40 @@ label {
     pointer-events: none;
     letter-spacing: 0.02em;
 }
+
+
+/* УДАЛЕНИЕ */
+
+.delete-btn {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 20px;
+    height: 20px;
+    background-color: rgba(250, 115, 115, 0.15);
+    color: #fca5a5;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: none;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    line-height: 1;
+    padding: 0;
+    padding-bottom: 2px;
+}
+
+#canvas .delete-btn {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.delete-btn:hover {
+    background-color: rgba(250, 115, 115, 0.4);
+    color:#f6f4f4
+}
+

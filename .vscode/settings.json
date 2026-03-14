@@ -1,0 +1,18 @@
+{
+    "background.backgroundBlur": [
+        "1000",
+        "0",
+        "0",
+        "0"
+    ],
+    "background.windowBackgrounds": [
+        "c:/Users/mrkay/Downloads/2181fa289499bf9c69df3bad3f9897fd.jpg",
+        "c:/Users/mrkay/Downloads/fd3962fd31b20c8017d4cbcb9fd30811.jpg"
+    ],
+    "background.backgroundOpacity": [
+        0.01,
+        0.1,
+        0.1,
+        0.1
+    ]
+}

@@ -28,42 +28,147 @@
         <h2>Палитра</h2>
 
         <div class="block-var" draggable = "true"> var
+            <span class="delete-btn">&times;</span> 
             <br>
-            <label for="type-input">type</label><select class="type-input" name = "type">
+            <span>type</span>
+            <select class="type-input" name="type">
                 <option value="int">int</option>
+                <option value="float">float</option>
                 <option value="string">string</option>
-                <option value="bool">bool</option>
+                <option value="boolean">boolean</option>
             </select>
 
-            <label for="name-input">name </label><input class="name-input" type="text">
+            <span>name</span>
+            <input class="name-input" type="text">
+            
+            <span>=</span>
+            <input class="init-expr-input" type="text">
         </div>
 
-        <div class="block-assign" draggable = "true">assign
-            <label for="var-input">var</label><select class="var-input" name = "var-input">
-                <option value="test1">test1</option>
-                <option value="test2">test2</option>
-                <option value="test3">test3</option>
+        <div class="block-var-array" draggable="true"> var
+            <span class="delete-btn">&times;</span>
+            
+            <span>array</span>
+            <span>&lt;</span>
+            
+            <select class="element-type-input">
+                <option value="int">int</option>
+                <option value="float">float</option>
+                <option value="string">string</option>
+                <option value="boolean">boolean</option>
+                <!-- <option value="array">array&lt;...&gt;</option> -->
             </select>
-                                    <label> = </label>
-            <input class="expr-input" type = "text">
-                                </div>
 
-        <div class="block-print-var" draggable="true">print
-            <label for="var-input">var</label><select class="var-input" name = "var-input">
-                <option value="test1">test1</option>
-                <option value="test2">test2</option>
-                <option value="test3">test3</option>
+            <span>, </span>
+            
+            <input class="size-input" type="text">
+            
+            <span>&gt;</span>
+            
+            <span>name</span>
+            <input class="name-input" type="text">
+
+            <span>=</span>
+
+            <input class="init-expr-input" type="text">
+        </div>
+
+        <div class="block-assign" draggable = "true"> assign
+            <span class="delete-btn">&times;</span> 
+            <span>var</span>
+            <select class="var-input">
+                <option value="test">test</option>
+            </select>
+            <span> = </span>
+            <input class="expr-input" type = "text">
+        </div>
+
+        <div class="block-assign-array" draggable="true"> assign
+            <span class="delete-btn">&times;</span>
+            <span>array</span>
+            <select class="var-input">
+                <option value="test">test</option>
+            </select>
+            <span><==</span>
+            <input class="index-input" type="text">
+            <span> = </span>
+            <input class="expr-input" type="text">
+        </div>
+
+        <div class="block-print-var" draggable="true"> print
+            <span class="delete-btn">&times;</span>
+            
+            <span>var</span>
+            <select class="var-input" name = "var-input">
+                <option value="test">test</option>
             </select>
         </div>
 
         <div class ="block-while" draggable = "true">
+            <span class="delete-btn">&times;</span>
             <div class="block-header">While: </div><input class="expr-input" type="text">
 
             <div class="inner-slot">do</div>
         </div>
+        
         <div class="block-container" draggable = "true">
+            <span class="delete-btn">&times;</span>
             <div class="block-header">Container:</div>
             <div class="inner-slot"></div>
+        </div>
+
+        <div class="block-print-expr" draggable="true"> print
+            <span class="delete-btn">&times;</span>
+            <input class="expr-input" type="text">
+        </div>
+
+        <div class="block-if" draggable="true">
+            <span class="delete-btn">&times;</span>
+            <div class="block-header">if: </div>
+            <input class="expr-input" type="text">
+            <div class="inner-slot">then</div>
+            
+            <div class="inner-slot">else</div>
+        </div>
+
+        <div class="block-for" draggable="true"> 
+            <span class="delete-btn">&times;</span>
+            <div class="block-header">for: </div>
+            <header>
+                <span>(</span>
+                
+                <select class="type-input" name="type">
+                    <option value="int">int</option>
+                    <option value="float">float</option>
+                    <option value="string">string</option>
+                    <option value="boolean">boolean</option>
+                </select>
+                
+                <input class="name-input" type="text">
+
+                <span>=</span>
+
+                <input class="init-expr-input" type="text">
+                
+                <label>;</label>
+
+                <span>till</span>
+
+                <input class="condition-input" type="text">
+                
+                <label>;</label>
+                
+                <select class="counter-var-input">
+                    <option value="test">test</option>
+                </select>
+                <span> = </span>
+                <input class="step-expr-input" type="text">
+                
+                
+                <span>)</span>
+            </header>
+            
+            <div class="inner-slot">do</div>
         </div>
 
     </div>
@@ -75,18 +180,12 @@
             <div id = "console">
         <div class="console-header">
             <h2>Консоль</h2>
+            <button id = "toggle-console" class="toggle-btn">>></button>
             <button id="btn-clear-console" class="console-clear-btn">Clear</button>
             </div>
         <div id="console-output"></div>
     </div>
 </div>
-
-    <script src="scope.js"></script>
-    <script src="expr_parser.js"></script>
-    <script src="ast.js"></script>
-    <script src="interpretator.js"></script>
-    <script src="script.js"></script>
+    <script type="module" src="main.js"></script>
 </body>
-</html>  
-
-  
+</html>
