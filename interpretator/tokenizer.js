@@ -4,16 +4,50 @@ const SINGLE_OPS = '+-*/()[]=!<>%,';
 export const CONTINUE_TOKEN = '^';
 
 export function tokenize(expr) {
-    expr = expr.replace(/\s+/g, '');
+    // expr = expr.replace(/\s+/g, '');
 
     const tokens = [];
 
     let i = 0;
     while (i < expr.length) {
         const char = expr[i];
+        
+        if (/\s/.test(char)) {
+            i++;
+            continue;
+        }
 
         if (char === CONTINUE_TOKEN) {
             i++;
+            continue;
+        }
+
+        if (char === '"') {
+            let str = '';
+            i++;
+
+            while (i < expr.length && expr[i] !== '"') {
+                if (expr[i] === '\\' && i + 1 < expr.length) {
+                    i++;
+                    const escape_char = expr[i];
+                    switch (escape_char) {
+                        case 'n': str += '\n'; break;
+                        case 't': str += '\t'; break;
+                        case '\\': str += '\\'; break;
+                        case '"': str += '"'; break;
+                        default: str += escape_char                            
+                    }
+                } else {
+                    str += expr[i];
+                }
+                i++;
+            }
+
+            if (i >= expr.length) {
+                throw new Error(`Bad StringLiteral: missing closing ${'"'}`);
+            }
+            i++;
+            tokens.push({ type: 'string', value: str });
             continue;
         }
 

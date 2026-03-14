@@ -366,7 +366,7 @@ span {
 
 #console-output {
     flex: 1;
-    padding: 12px16px;
+    padding: 12px 16px;
     overflow-y: auto;
     font-family: 'SF Mono', 'Consolas', monospace;
     /*SF Mono   Cascadia Code   Fira Code   Consolas*/

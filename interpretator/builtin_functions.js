@@ -1,7 +1,7 @@
 import { COMPLEX_TYPES, TYPES, typedValue } from "./types.js";
 
 export const BUILTIN_FUNCTIONS = {
-    'toInt': typedValue(
+    'ToInt': typedValue(
         COMPLEX_TYPES.FUNCTION,
         { overloads: [
             {
@@ -33,7 +33,7 @@ export const BUILTIN_FUNCTIONS = {
     ),
         
     
-    'toFloat': typedValue(
+    'ToFloat': typedValue(
         COMPLEX_TYPES.FUNCTION,
         { overloads: [
             {
@@ -64,7 +64,7 @@ export const BUILTIN_FUNCTIONS = {
         ] }
     ),
 
-    'toString': typedValue(
+    'ToString': typedValue(
         COMPLEX_TYPES.FUNCTION,
         { overloads: [
             {
@@ -79,7 +79,7 @@ export const BUILTIN_FUNCTIONS = {
         ] }
     ),
     
-    'toBool': typedValue(
+    'ToBool': typedValue(
         COMPLEX_TYPES.FUNCTION,
         { overloads: [
             {
@@ -105,7 +105,7 @@ export const BUILTIN_FUNCTIONS = {
             }
         ] }
     ),
-    'length': typedValue(
+    'Length': typedValue(
         COMPLEX_TYPES.FUNCTION,
         { overloads: [
             {

@@ -200,6 +200,10 @@ class ExpressionParser {
             case 'number':
                 this.consume();
                 return {type: 'NumberLiteral', value: token.value};
+            case 'string':
+                this.consume();
+                return this.parsePostfix({ type: 'StringLiteral', value: token.value });
+
             case 'identifier':
                 this.consume();
                 return this.parsePostfix({type: 'Var', name: token.value});

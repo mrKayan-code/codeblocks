@@ -168,6 +168,8 @@ class Interpretator {
         switch (expr.type) {
             case 'NumberLiteral':
                 return typedValue(getTypeOf(expr.value), expr.value);
+            case 'StringLiteral':
+                return typedValue(TYPES.STRING, expr.value,);
             case 'BooleanLiteral':
                 return typedValue(TYPES.BOOLEAN, expr.value);
             case 'ArrayLiteral':
@@ -177,19 +179,26 @@ class Interpretator {
                 const obj = this.evalExpr(expr.obj, scope);
                 const index = this.evalExpr(expr.index, scope);
 
-                if (!isArrayType(obj.type)) {
-                    throw new Error(`Cannot get el by index from var with type: ${obj.type}`);
-                }
-
                 if (!typeMatch(TYPES.INT, index.type)) {
                     throw new Error(`Index must be typr int, got: ${index.type}`);
                 }
 
-                if (index.value < 0 || index.value >= obj.type.size) {
-                    throw new Error(`Index out of range: [${index.value}]`);
-                }
+                if (isArrayType(obj.type)) {
+                    if (index.value < 0 || index.value >= obj.type.size) {
+                        throw new Error(`Index out of range: [${index.value}]`);
+                    }
 
-                return obj.value[index.value];
+                    return obj.value[index.value];
+                } else if (obj.type === TYPES.STRING) {
+                    if (index.value < 0 || index.value >= obj.value.length) {
+                        throw new Error(`Index out of range: [${index.value}]`);
+                    }
+
+                    return obj.value[index.value];
+                } else {
+                    throw new Error(`Cannot get el by index from var with type: ${obj.type}`);
+                }
+                
             case 'Var':
                 const vari = scope.getVar(expr.name);
                 if (!vari) {
@@ -313,7 +322,9 @@ self.onmessage = function(e) {
     const global_scope = new Scope(null);
 
     registerBuiltins(global_scope);
-
+    self.postMessage({type: "output",
+        message: global_scope.getNameListOfVisibleVars()
+    })
     try {
         interpretator.run(ast, global_scope);
         self.postMessage({type: "done"});
