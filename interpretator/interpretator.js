@@ -1,6 +1,10 @@
 import { BINARY_OPERATORS_SIGNATURES, UNARY_OPERATORS_SIGNATURES } from "./operators.js";
 import { Scope } from "./scope.js";
-import { typeMatch, TYPES, typedValue, getTypeOf, isArrayType, stringifyTypedValue, isComplexType, COMPLEX_TYPES, makeArrayType, stringifyType } from "./types.js";
+import { typeMatch, TYPES, typedValue, getTypeOf, stringifyTypedValue, isComplexType, COMPLEX_TYPES, stringifyType } from "./types.js";
+import { isArrayType, createArrayType } from "./array_types.js";
+import { getCompatibleOverload } from "./function_types.js";
+import { BUILTIN_FUNCTIONS } from "./builtin_functions.js";
+
 class Interpretator {
     constructor () {
         this.stopped = false;
@@ -34,7 +38,7 @@ class Interpretator {
     execute(node, block_type, scope) {
         switch (block_type) {
             case 'block-var': (() => {
-                const initial_value = node.init_expr ? this.evalExpr(node.init_expr, scope).value : this.getDefaultValueForType(node.type);
+                const initial_value = node.init_expr ? this.evalExpr(node.init_expr, scope) : typedValue(node.type, this.getDefaultValueForType(node.type));
                 
                 scope.addVar(node.name, node.type, initial_value);
             })();            
@@ -42,7 +46,7 @@ class Interpretator {
 
             case 'block-var-array': (() => {})();
                 const tv = this.initArray(node, scope, this.getDefaultValueForType(node.element_type));
-                const initial_value = node.init_expr ? this.evalExpr(node.init_expr, scope).value : tv.value;
+                const initial_value = node.init_expr ? this.evalExpr(node.init_expr, scope) : tv;
 
                 scope.addVar(node.name, tv.type, initial_value);
                 break;
@@ -125,7 +129,7 @@ class Interpretator {
             case 'block-for':(() => {
                 const for_scope = new Scope(scope);
 
-                const initial_value = node.step_var_init_expr ? this.evalExpr(node.step_var_init_expr, for_scope).value : this.getDefaultValueForType(node.step_var_type);
+                const initial_value = node.step_var_init_expr ? this.evalExpr(node.step_var_init_expr, for_scope) : typedValue(node.step_var_type, this.getDefaultValueForType(node.step_var_type));
                 
                 for_scope.addVar(node.step_var_name, node.step_var_type, initial_value);
 
@@ -200,6 +204,8 @@ class Interpretator {
             case 'UnaryExpr':
                 const argument = this.evalExpr(expr.argument, scope);
                 return this.computeUnary(expr.op, argument)
+            case 'FuncCall':
+                return this.callFunction(expr.caller, expr.args, scope);
             default:
                 throw new Error(`Unknown expr type: ${expr.type}`);
         }
@@ -238,6 +244,31 @@ class Interpretator {
         return typedValue(match.result_type, signature.impl(left.value, right.value));
     }
 
+    callFunction(caller, arg_nodes, scope) {
+        const func_name = caller.type === 'Var' ? caller.name : null;
+        if (!func_name) {
+            throw new Error(`FuncCall expected func_name, got ${caller.type}`);
+        }
+
+        const func = scope.getVar(func_name);
+
+        if (!func) {
+            throw new Error(`Function with name ${func_name} not registred`);
+        }
+        if (func.type !== COMPLEX_TYPES.FUNCTION) {
+            throw new Error(`Unable call function from ${stringifyType(func.type)}`);
+        }
+
+        const args = arg_nodes.map(arg => this.evalExpr(arg, scope));
+
+        const compatible_overload = getCompatibleOverload(func.value.overloads, args);
+        if (!compatible_overload) {
+            throw new Error(`No compatible overload for param types: ${args.map(arg => stringifyType(arg))}`);
+        }
+
+        return compatible_overload.impl(args, scope);
+    }
+
     getDefaultValueForType(type) {
         if (!isComplexType(type)) {
             switch (type) {
@@ -268,9 +299,9 @@ class Interpretator {
 
         // if (typeof node.type.element_type !== 'string') {
         if (typeof node.element_type !== 'string') {  
-            return typedValue(makeArrayType(this.initArray(node.element_type, scope, default_val).type, size_tv.value), makeArray(size_tv.value, this.initArray(node.element_type, scope, default_val).value))
+            return typedValue(createArrayType(this.initArray(node.element_type, scope, default_val).type, size_tv.value), makeArray(size_tv.value, this.initArray(node.element_type, scope, default_val).value))
         } else {
-            return typedValue(makeArrayType(node.element_type, size_tv.value),makeArray(size_tv.value,typedValue(node.element_type, this.getDefaultValueForType(node.element_type))));
+            return typedValue(createArrayType(node.element_type, size_tv.value),makeArray(size_tv.value,typedValue(node.element_type, this.getDefaultValueForType(node.element_type))));
         }
     }
 }
@@ -279,8 +310,12 @@ self.onmessage = function(e) {
     const { ast } = e.data;
     const interpretator = new Interpretator();
     
+    const global_scope = new Scope(null);
+
+    registerBuiltins(global_scope);
+
     try {
-        interpretator.run(ast, null);
+        interpretator.run(ast, global_scope);
         self.postMessage({type: "done"});
     } catch (error) {
         self.postMessage({type: "error"});
@@ -294,4 +329,10 @@ function makeArray(size, tv) {
         arr[i] = typedValue(tv.type, tv.value);
     }
     return arr;
+}
+
+function registerBuiltins(scope) {
+    for (const [name, func] of Object.entries(BUILTIN_FUNCTIONS)) {
+        scope.addVar(name, COMPLEX_TYPES.FUNCTION, func);
+    }
 }

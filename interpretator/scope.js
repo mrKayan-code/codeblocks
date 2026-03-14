@@ -1,4 +1,4 @@
-import { typeMatch, getTypeOf, typedValue, stringifyType } from "./types.js";
+import { typeMatch, getTypeOf, typedValue, stringifyType, TYPES } from "./types.js";
 
 export class Scope {
     parent;
@@ -26,18 +26,18 @@ export class Scope {
 
     }
 
-    addVar(name, type, initial_value = null) {
+    addVar(name, type, initial_typed_value = typedValue(TYPES.NULL, null)) {
         // if (this.hasLocal(name)) {
         //     // return this.var_table[name];
         // }
 
-        if (!isTypeCompatible(type, initial_value)) {
+        if (!isTypeCompatible(type, initial_typed_value)) {
             throw new Error(`type error: var '${name}' expect ${stringifyType(type)}, got ${stringifyType(getTypeOf(initial_value))}`);
         }
 
         
 
-        this.var_table[name] = typedValue(type, initial_value);
+        this.var_table[name] = typedValue(type, initial_typed_value.value);
         
         return this.var_table[name];
     }
@@ -99,12 +99,16 @@ export class Scope {
     }
 }
 
-function isTypeCompatible(expected_type, value) {
-    if (value === null) {
+function isTypeCompatible(expected_type, t_value) {
+    if (!t_value) {
+        return false;
+    } 
+    if (!'type' in t_value) {
+        return false;
+    }
+    if (t_value.type === TYPES.NULL) {
         return true;
     }
 
-    const actual_type = getTypeOf(value);
-
-    return typeMatch(expected_type, actual_type)        
+    return typeMatch(expected_type, t_value.type)
 }

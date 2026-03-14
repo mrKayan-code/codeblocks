@@ -1,7 +1,6 @@
 import { parseStringExpr } from "./interpretator/expr_parser.js";
 import { Scope } from "./interpretator/scope.js";
 import { CONTINUE_TOKEN } from "./interpretator/tokenizer.js";
-import { makeArrayType } from "./interpretator/types.js";
 
 export function buildUIASTFromCanvas(canvas) {    
     return buildUIAST(canvas, null);;
@@ -45,7 +44,7 @@ function convertBlockToNode(block, scope) {
                 const init_expr = init_expr_input ? parseStringExpr(init_expr_input) : null;
 
                 if (name !== '' && scope) {
-                    scope.addVar(name, type, undefined);
+                    scope.addVar(name, type);
                 } else {
                     throw new Error('Var has no name')
                 }
@@ -62,7 +61,7 @@ function convertBlockToNode(block, scope) {
                 const init_expr = init_expr_input ? parseStringExpr(init_expr_input) : null;
 
                 if (name !== '' && scope) {
-                    scope.addVar(name, 'array', undefined);
+                    scope.addVar(name, 'array');
                 } else {
                     throw new Error('Var has no name')
                 }
@@ -156,7 +155,7 @@ function convertBlockToNode(block, scope) {
                 const for_scope = new Scope(scope);
                 
                 if (var_name !== '' && scope) {
-                    for_scope.addVar(var_name, type, undefined);
+                    for_scope.addVar(var_name, type);
                 } else {
                     throw new Error('Var has no name')
                 }

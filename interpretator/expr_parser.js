@@ -222,7 +222,7 @@ class ExpressionParser {
                         elements.push(this.parse());
                     }
 
-                    this.expect('op', ']')
+                    this.expect('op', ']');
                     return this.parsePostfix({type: 'ArrayLiteral', elements: elements});
                 }
                 throw new Error(`Unexpected op: '${token.value}' in factor`);
@@ -245,7 +245,24 @@ class ExpressionParser {
         }
 
         while(this.peek() && this.peek().value === '(') {
-            //TODO(funcCall)
+            this.consume();
+            const args = [];
+            if (this.peek() && this.peek().value !== ')') {
+                args.push(this.parse());
+                
+                while(this.peek() && this.peek().value === ',') {
+                    this.consume();
+                    args.push(this.parse());
+                }
+            }
+            
+            this.expect('op', ')')
+
+            node = {
+                type: 'FuncCall',
+                caller: node,
+                args: args
+            }
         }
 
         return node;

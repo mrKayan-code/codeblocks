@@ -1,3 +1,5 @@
+import { createFunctionType } from "./function_types.js";
+import { createArrayType, isArrayType } from "./array_types.js";
 export const TYPES = {
     INT: 'int',
     FLOAT: 'float',
@@ -11,13 +13,13 @@ export const TYPES = {
 };
 
 export const COMPLEX_TYPES = {
-    ARRAY: 'array'
+    ARRAY: 'array',
+    FUNCTION: 'function'
 }
 
 export function isComplexType(type) {
     return type && typeof type === 'object' && 'complex_type' in type;
 }
-
 
 export function typeMatch(expected, actual) {
     if (!isComplexType(expected)) {
@@ -69,7 +71,7 @@ export function getTypeOf(value) {
 
     if(Array.isArray(value)) {
         if (value.length === 0) {
-            return makeArrayType(TYPES.ANY, 0);
+            return createArrayType(TYPES.ANY, 0);
         }
         
         let common_type = getTypeOf(value[0]);
@@ -85,8 +87,12 @@ export function getTypeOf(value) {
         //     return makeArrayType(first_el_type, value.length); //TODO(проблема с массивом флоатов: если первый не число.(не ноль) или просто число без точки, а остальные флоаты, он определяет массив как any, нужен костыль сюда)
         // }
 
-        return makeArrayType(common_type, value.length);
+        return createArrayType(common_type, value.length);
 
+    }
+
+    if (typeof value === 'function') {
+        return createFunctionType();
     }
 
     if (typeof value === 'object' && 'type' in value) {
@@ -104,41 +110,6 @@ export function typedValue(type, value) {
     };
 }
 
-export function isArrayType(type) {
-    if (!type) {
-        return false;
-    }
-    
-    if (!isComplexType) {
-        return false; 
-    }
-
-    return type.complex_type === COMPLEX_TYPES.ARRAY;
-}
-
-export function getInfoOfArrayType(type) {
-    if (!isArrayType(type)) {
-        return null;
-    }
-    
-    return {
-        element_type: type.element_type,
-        size: type.size
-    };
-}
-
-
-
-export function makeArrayType(element_type, size) {
-    return {
-        complex_type: COMPLEX_TYPES.ARRAY,
-        element_type: element_type,
-        size: size
-    };
-}
-
-
-
 export function propagateType(type_a, type_b) {
     if (type_a === type_b) return type_a;
     
@@ -152,23 +123,24 @@ export function propagateType(type_a, type_b) {
 }
 
 export function stringifyTypedValue(typed_value) {
-    
-    if(isArrayType(typed_value.type)) {
-        let result = '';
-        result += '['
+    if (isComplexType(typedValue.value)) { 
+        if(isArrayType(typed_value.type)) {
+            let result = '';
+            result += '['
 
 
-        if (typed_value.type.size > 0) {
+            if (typed_value.type.size > 0) {
 
-            result += stringifyTypedValue(typed_value.value[0]);
+                result += stringifyTypedValue(typed_value.value[0]);
 
-            for (let i = 1; i < typed_value.type.size; i++) {
-                result += ', ' +  stringifyTypedValue(typed_value.value[i]);                
+                for (let i = 1; i < typed_value.type.size; i++) {
+                    result += ', ' +  stringifyTypedValue(typed_value.value[i]);                
+                }
             }
-        }
-        result += ']'
+            result += ']'
 
-        return result;
+            return result;
+        }
     }
     return typed_value.value;
 }
