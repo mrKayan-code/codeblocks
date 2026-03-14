@@ -127,7 +127,7 @@ export function propagateType(type_a, type_b) {
 }
 
 export function stringifyTypedValue(typed_value) {
-    if (isComplexType(typedValue.value)) { 
+    if (isComplexType(typed_value.type)) { 
         if(isArrayType(typed_value.type)) {
             let result = '';
             result += '['

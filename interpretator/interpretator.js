@@ -114,8 +114,8 @@ class Interpretator {
             case 'block-if':(() => {
                 const typed_predicate = this.evalExpr(node.condition, scope);
 
-                if (!typeMatch(TYPES.BOOLEAN, if_predicate.type)) {
-                    throw new Error(`Expected boolean, got ${if_predicate.type}`);
+                if (!typeMatch(TYPES.BOOLEAN, typed_predicate.type)) {
+                    throw new Error(`Expected boolean, got ${typed_predicate.type}`);
                 }
 
                 if (typed_predicate.value) {
@@ -269,7 +269,7 @@ class Interpretator {
         }
 
         const args = arg_nodes.map(arg => this.evalExpr(arg, scope));
-        
+
         const compatible_overload = getCompatibleOverload(func.value.overloads, args);
         if (!compatible_overload) {
             throw new Error(`No compatible overload for param types: ${args.map(arg => stringifyType(arg))}`);
