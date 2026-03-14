@@ -105,17 +105,18 @@ export const BUILTIN_FUNCTIONS = {
             }
         ] }
     ),
+
     'Length': typedValue(
         COMPLEX_TYPES.FUNCTION,
         { overloads: [
             {
-                signature: { params: [TYPES.STRING], return: TYPES.INT },
+                signature: { param_types: [TYPES.STRING], return_type: TYPES.INT },
                 impl: (args, scope) => {
                     return typedValue(TYPES.INT, args[0].value.length);
                 }
             },
             {
-                signature: { params: [COMPLEX_TYPES.ARRAY], return: TYPES.INT },
+                signature: { param_types: [COMPLEX_TYPES.ARRAY], return_type: TYPES.INT },
                 impl: (args, scope) => {
                     return typedValue(TYPES.INT, args[0].type.size)
                 }

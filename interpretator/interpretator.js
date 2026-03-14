@@ -269,7 +269,7 @@ class Interpretator {
         }
 
         const args = arg_nodes.map(arg => this.evalExpr(arg, scope));
-
+        
         const compatible_overload = getCompatibleOverload(func.value.overloads, args);
         if (!compatible_overload) {
             throw new Error(`No compatible overload for param types: ${args.map(arg => stringifyType(arg))}`);
@@ -323,8 +323,9 @@ self.onmessage = function(e) {
 
     registerBuiltins(global_scope);
     self.postMessage({type: "output",
-        message: global_scope.getNameListOfVisibleVars()
+        message: "Builtins: " + global_scope.getNameListOfVisibleVars()
     })
+
     try {
         interpretator.run(ast, global_scope);
         self.postMessage({type: "done"});

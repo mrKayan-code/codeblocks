@@ -32,6 +32,10 @@ export function typeMatch(expected, actual) {
             return true; //TODO(переделать на что то адекватное либо так оставить. пока это единственное из типов, что можно )
         }
 
+        if (expected === COMPLEX_TYPES.ARRAY && isArrayType(actual)) {
+            return true;
+        }
+
         return expected === actual;
     } else if (isComplexType(actual)) {
         if (expected.complex_type !== actual.complex_type) {
